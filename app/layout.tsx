@@ -1,18 +1,17 @@
 import type { Metadata } from "next";
-import { Inter, Instrument_Serif } from "next/font/google";
+import { Instrument_Sans, Instrument_Serif, JetBrains_Mono, Caveat } from "next/font/google";
 import "./globals.css";
 import SmoothScroll from "@/components/SmoothScroll";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import PaperPlane from "@/components/PaperPlane";
 
-const inter = Inter({
+const sans = Instrument_Sans({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-sans",
   display: "swap",
 });
 
-const instrumentSerif = Instrument_Serif({
+const serif = Instrument_Serif({
   subsets: ["latin"],
   weight: "400",
   style: ["normal", "italic"],
@@ -20,15 +19,31 @@ const instrumentSerif = Instrument_Serif({
   display: "swap",
 });
 
+const mono = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500", "700"],
+  variable: "--font-mono",
+  display: "swap",
+});
+
+const hand = Caveat({
+  subsets: ["latin"],
+  weight: ["500", "700"],
+  variable: "--font-hand",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
-  title: "Jaime Rabazo — Computer Science × Business",
+  title: "Jaime Rabazo — ML, AI & Technology Strategy",
   description:
-    "Portfolio of Jaime Rabazo Fernández — dual-degree candidate in Computer Science and Business Administration, working at the intersection of data engineering and business strategy.",
-  metadataBase: new URL("https://jaime-rabazo.github.io"),
+    "Jaime Rabazo Fernández — Computer Science + Business Administration (UC3M). Built production ML at Telefónica and an AI tender analysis platform at Telefónica Tech.",
+  metadataBase: new URL("https://jaimerabazo.com"),
+  alternates: { canonical: "/" },
   openGraph: {
-    title: "Jaime Rabazo — Computer Science × Business",
+    title: "Jaime Rabazo — ML, AI & Technology Strategy",
     description:
-      "Dual-degree candidate building at the intersection of data engineering and business strategy.",
+      "Production ML across 52,000+ mobile cells. An AI platform that cut RFP triage from 3 hours to 5 minutes.",
+    url: "https://jaimerabazo.com",
     type: "website",
   },
 };
@@ -37,12 +52,14 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${instrumentSerif.variable}`}>
-      <body className="bg-bone-100 text-ink-900 font-sans antialiased grain">
+    <html
+      lang="en"
+      className={`${sans.variable} ${serif.variable} ${mono.variable} ${hand.variable}`}
+    >
+      <body className="text-ink-900 font-sans antialiased">
         <SmoothScroll />
         <Navbar />
-        <PaperPlane />
-        <main className="relative z-[2]">{children}</main>
+        <main className="relative">{children}</main>
         <Footer />
       </body>
     </html>

@@ -30,11 +30,11 @@ jobs:
       - name: Detect base path
         id: basepath
         run: |
-          # If the repo is <user>.github.io (a user site), serve from root.
+          # Custom domain (public/CNAME) or <user>.github.io → serve from root.
           # Otherwise, serve from /<repo-name>/.
           REPO_NAME="${GITHUB_REPOSITORY#*/}"
           OWNER="${GITHUB_REPOSITORY%/*}"
-          if [[ "$REPO_NAME" == "${OWNER}.github.io" ]]; then
+          if [[ -f public/CNAME || "$REPO_NAME" == "${OWNER}.github.io" ]]; then
             echo "base=" >> $GITHUB_OUTPUT
           else
             echo "base=/$REPO_NAME" >> $GITHUB_OUTPUT

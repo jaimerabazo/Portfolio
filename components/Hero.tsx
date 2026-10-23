@@ -1,217 +1,198 @@
 "use client";
 
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
-import { CSSProperties, useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
+import { CSSProperties, useEffect, useState } from "react";
+import SplitFlap from "./SplitFlap";
+import { ARROW, CIRCLE, Doodle } from "./Doodles";
+
+const ease = [0.22, 1, 0.36, 1] as const;
+
+function MadridClock() {
+  const [time, setTime] = useState<string | null>(null);
+  useEffect(() => {
+    const fmt = new Intl.DateTimeFormat("en-GB", {
+      timeZone: "Europe/Madrid",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+    const update = () => setTime(fmt.format(new Date()));
+    update();
+    const id = setInterval(update, 15000);
+    return () => clearInterval(id);
+  }, []);
+  return <span className="tabular">{time ?? "--:--"}</span>;
+}
 
 export default function Hero() {
-  const ref = useRef<HTMLDivElement>(null);
-  const photoRef = useRef<HTMLDivElement>(null);
-
-  // Raw cursor position normalized to [-1, 1] within the hero
-  const mx = useMotionValue(0);
-  const my = useMotionValue(0);
-
-  // Spring-smoothed for nicer motion
-  const sx = useSpring(mx, { stiffness: 80, damping: 18, mass: 0.6 });
-  const sy = useSpring(my, { stiffness: 80, damping: 18, mass: 0.6 });
-
-  // Photo tilt
-  const rotateY = useTransform(sx, [-1, 1], [-8, 8]);
-  const rotateX = useTransform(sy, [-1, 1], [6, -6]);
-  const photoX = useTransform(sx, [-1, 1], [-10, 10]);
-  const photoY = useTransform(sy, [-1, 1], [-8, 8]);
-
-  // Spotlight position — percentage values
-  const spotX = useTransform(sx, [-1, 1], ["20%", "80%"]);
-  const spotY = useTransform(sy, [-1, 1], ["25%", "75%"]);
-
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
   const heroSrc = `${basePath}/images/jaime-hero.png`;
   const frameSrc = `${basePath}/images/polaroid-frame.png`;
+  const cvSrc = `${basePath}/cv/Jaime-Rabazo-CV.pdf`;
 
-  const [imgOk, setImgOk] = useState(true);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const onMove = (e: PointerEvent) => {
-      const rect = el.getBoundingClientRect();
-      const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-      const ny = ((e.clientY - rect.top) / rect.height) * 2 - 1;
-      mx.set(Math.max(-1, Math.min(1, nx)));
-      my.set(Math.max(-1, Math.min(1, ny)));
-    };
-    const onLeave = () => {
-      mx.set(0);
-      my.set(0);
-    };
-    el.addEventListener("pointermove", onMove);
-    el.addEventListener("pointerleave", onLeave);
-    return () => {
-      el.removeEventListener("pointermove", onMove);
-      el.removeEventListener("pointerleave", onLeave);
-    };
-  }, [mx, my]);
-
-  // ─────────────────────────────────────────────────────────────────────
-  // PHOTO COMPOSITION — adjust these CSS vars to fit your photo perfectly
-  //
-  //   --inside-*  : the photo behind the frame (visible through the window)
-  //                 Tune so your TORSO sits centered inside the frame window.
-  //   --outside-* : the same photo on top of the frame (only top portion shown)
-  //                 Tune so your ARMS / HEAD line up above the frame.
-  //   --outside-cut: how much of the photo (from top) to keep visible above
-  //                  the frame. Lower = less sticking out.
-  //
-  //   To match perfectly: keep --inside-* and --outside-* IDENTICAL and only
-  //   tweak --outside-cut so the bottom of the visible overlay touches the
-  //   top edge of the frame's polaroid window.
-  // ─────────────────────────────────────────────────────────────────────
+  // Photo composition: keep --inside-* and --outside-* identical and tweak
+  // --outside-cut so the overlay meets the top edge of the frame.
   const photoVars: CSSProperties = {
-    ["--inside-scale" as string]: "1.05",
-    ["--inside-x" as string]: "0%",
-    ["--inside-y" as string]: "26%",
-    ["--outside-scale" as string]: "1.05",
-    ["--outside-x" as string]: "0%",
-    ["--outside-y" as string]: "26%",
+    ["--photo-scale" as string]: "1.05",
+    ["--photo-y" as string]: "26%",
     ["--outside-cut" as string]: "30%",
   };
+  const photoTransform =
+    "translate(-50%, -50%) translate(0, var(--photo-y)) scale(var(--photo-scale))";
 
   return (
-    <section
-      id="top"
-      ref={ref}
-      className="relative flex min-h-[100svh] items-center overflow-hidden px-6 md:px-10"
-      style={{ perspective: 1200 }}
-    >
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-ink-900/12" />
-
-      {/* Cursor-following soft spotlight */}
-      <motion.div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 -z-0"
-        style={{
-          background: useTransform(
-            [spotX, spotY] as never,
-            ([x, y]: string[]) =>
-              `radial-gradient(520px 420px at ${x} ${y}, rgba(50, 122, 117, 0.13), transparent 70%), radial-gradient(520px 360px at 12% 24%, rgba(185, 106, 67, 0.12), transparent 72%)`
-          ),
-        }}
-      />
-
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-        className="relative z-10 w-full max-w-[100rem] mx-auto pt-28 md:pt-0 grid gap-12 md:grid-cols-[1.4fr_1fr] md:items-center"
-      >
-        <div>
-          <p className="flex items-center gap-3 text-[11px] uppercase tracking-[0.32em] text-ink-500">
-            <span className="h-px w-8 accent-rule" />
-            <span>Madrid · Available 2026</span>
-          </p>
-
-          <h1 className="mt-10 md:mt-14 font-display font-semibold text-mega tracking-tightest text-ink-900">
-            <span className="block">Jaime</span>
-            <span className="block">
-              Rabazo<span className="accent-text">.</span>
-            </span>
-          </h1>
-
-          <p className="mt-10 md:mt-12 max-w-2xl text-xl md:text-2xl leading-snug text-ink-700 tracking-tight2">
-            CS & Business student at UC3M. Currently doing ML and network
-            automation work at Telefónica.
-          </p>
-
-          <div className="mt-12 flex flex-wrap items-center gap-3">
-            <a
-              href="#projects"
-              className="inline-flex items-center gap-2 rounded-full bg-ink-900 px-6 py-3.5 text-sm font-medium text-bone-50 shadow-[0_14px_30px_-20px_rgba(185,106,67,0.75)] hover:bg-copper-600 transition-colors"
-            >
-              See work
-              <span aria-hidden>→</span>
-            </a>
-            <a
-              href="#contact"
-              className="inline-flex items-center gap-2 rounded-full border border-sea-600/25 px-6 py-3.5 text-sm font-medium text-ink-900 hover:bg-sea-500/10 hover:border-sea-600/40 transition-colors"
-            >
-              Get in touch
-            </a>
-          </div>
-        </div>
-
-        {/* Portrait — parallax tilt following cursor */}
-        <motion.div
-          ref={photoRef}
-          style={{
-            rotateX,
-            rotateY,
-            rotate: -2.75,
-            x: photoX,
-            y: photoY,
-            transformStyle: "preserve-3d",
-          }}
-          className="relative mx-auto aspect-square w-[370px] md:mx-0 md:w-[530px] md:justify-self-center lg:-ml-8 lg:w-[650px]"
+    <section id="top" className="relative px-5 md:px-10 pt-28 md:pt-36 pb-16 md:pb-24">
+      <div className="mx-auto max-w-6xl">
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8 }}
+          className="flex flex-wrap gap-x-5 gap-y-1 font-mono text-[11px] uppercase tracking-[0.18em] text-ink-500"
         >
-          {imgOk ? (
-            <div className="absolute inset-0" style={photoVars}>
-              {/* Layer 1 — INSIDE: the part that shows through the polaroid window. */}
-              {/* Adjust torso position with --inside-* vars above. */}
-              <div className="absolute inset-0 overflow-hidden">
+          <span>MAD · 40.42°N 3.70°W</span>
+          <span>
+            Madrid time <MadridClock />
+          </span>
+          <span className="text-pen">
+            <span className="animate-blink">●</span> Open to new roles
+          </span>
+        </motion.p>
+
+        <div className="mt-8 grid gap-14 lg:grid-cols-[1.3fr_1fr] lg:items-center lg:gap-10">
+          <div>
+            <motion.h1
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.9, ease }}
+              className="board inline-block p-3 md:p-4"
+            >
+              <span className="block font-mono font-bold leading-none text-[clamp(2.6rem,8.5vw,6.25rem)]">
+                <span className="block">
+                  <SplitFlap text="JAIME " tiles step={80} delay={0.2} />
+                </span>
+                <span className="mt-[0.08em] block">
+                  <SplitFlap text="RABAZO" tiles step={80} delay={0.45} />
+                </span>
+              </span>
+              <span className="mt-3 flex justify-between gap-6 px-1 font-mono text-[10px] md:text-[11px] tracking-[0.2em] text-flap/60">
+                <span>PLATFORM 1</span>
+                <span>CS + BUSINESS · ML + AI</span>
+              </span>
+            </motion.h1>
+
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.9, delay: 0.15, ease }}
+            >
+              <p className="mt-10 max-w-xl font-serif text-[1.75rem] md:text-[2.15rem] leading-[1.15] text-ink-900">
+                I studied computer science and business at the same time.{" "}
+                <span className="italic text-ink-600">
+                  Mostly, I learned to translate between them.
+                </span>
+              </p>
+              <p className="mt-6 max-w-xl text-[17px] leading-relaxed text-ink-600">
+                I&apos;ve put ML into production across Spain&apos;s mobile
+                network at Telefónica, and built an AI tool at Telefónica Tech
+                that turned a{" "}
+                <span className="relative inline-block whitespace-nowrap text-ink-900">
+                  three-hour
+                  <Doodle
+                    paths={CIRCLE}
+                    viewBox="0 0 200 64"
+                    delay={1.2}
+                    strokeWidth={1.8}
+                    stretch
+                    className="pointer-events-none absolute -left-3 -top-2 h-[calc(100%+1rem)] w-[calc(100%+1.5rem)]"
+                  />
+                </span>{" "}
+                tender review into five minutes. Looking for the next place to
+                do that kind of work.
+              </p>
+
+              <div className="mt-9 flex flex-wrap items-center gap-3">
+                <a
+                  href="mailto:jaime.rabazofernandez@gmail.com"
+                  className="inline-flex items-center gap-2 rounded-full bg-ink-900 px-6 py-3.5 text-sm font-medium text-paper hover:bg-pen transition-colors"
+                >
+                  Email me <span aria-hidden>→</span>
+                </a>
+                <a
+                  href={cvSrc}
+                  download
+                  className="inline-flex items-center gap-2 rounded-full border border-ink-900/20 bg-paper-light px-6 py-3.5 text-sm font-medium text-ink-900 hover:border-ink-900/40 transition-colors"
+                >
+                  Download CV <span aria-hidden className="text-ink-400">↓</span>
+                </a>
+                <a
+                  href="https://www.linkedin.com/in/jaime-rabazo-fernandez/"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="px-3 py-3.5 text-sm font-medium text-ink-600 hover:text-ink-900 transition-colors link-reveal"
+                >
+                  LinkedIn ↗
+                </a>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Polaroid */}
+          <motion.figure
+            initial={{ opacity: 0, rotate: 2, y: 20 }}
+            animate={{ opacity: 1, rotate: 0, y: 0 }}
+            transition={{ duration: 1.1, delay: 0.2, ease }}
+            className="relative mx-auto w-full max-w-[340px] md:max-w-[440px]"
+          >
+            <div className="relative aspect-square w-full -rotate-[3deg] transition-transform duration-700 hover:rotate-0">
+              <div className="absolute inset-0" style={photoVars}>
+                <div className="absolute inset-0 overflow-hidden">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={heroSrc}
+                    alt="Jaime Rabazo taking a selfie through a polaroid frame"
+                    className="absolute left-1/2 top-1/2 w-full max-w-none select-none"
+                    draggable={false}
+                    fetchPriority="high"
+                    style={{ transform: photoTransform }}
+                  />
+                </div>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={frameSrc}
+                  alt=""
+                  aria-hidden
+                  className="pointer-events-none absolute inset-0 z-10 h-full w-full select-none drop-shadow-[0_28px_42px_rgba(21,21,21,0.16)]"
+                  draggable={false}
+                />
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={heroSrc}
-                  alt="Jaime Rabazo"
-                  className="absolute left-1/2 top-1/2 w-full max-w-none select-none"
+                  alt=""
+                  aria-hidden
+                  className="pointer-events-none absolute left-1/2 top-1/2 z-20 w-full max-w-none select-none"
                   draggable={false}
-                  onError={() => setImgOk(false)}
                   style={{
-                    transform:
-                      "translate(-50%, -50%) translate(var(--inside-x), var(--inside-y)) scale(var(--inside-scale))",
-                    transformOrigin: "center",
+                    transform: photoTransform,
+                    clipPath: "inset(0 0 calc(100% - var(--outside-cut)) 0)",
                   }}
                 />
               </div>
-
-              {/* Layer 2 — the polaroid frame */}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={frameSrc}
-                alt=""
-                aria-hidden
-                className="pointer-events-none absolute inset-0 z-10 h-full w-full select-none drop-shadow-[0_28px_42px_rgba(14,14,16,0.18)]"
-                draggable={false}
-              />
-
-              {/* Layer 3 — OUTSIDE: photo on top of frame, clipped so only the */}
-              {/* top portion (arms / head) sticks out. Tune --outside-cut. */}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={heroSrc}
-                alt=""
-                aria-hidden
-                className="pointer-events-none absolute left-1/2 top-1/2 z-20 w-full max-w-none select-none drop-shadow-[0_18px_24px_rgba(14,14,16,0.14)]"
-                draggable={false}
-                style={{
-                  transform:
-                    "translate(-50%, -50%) translate(var(--outside-x), var(--outside-y)) scale(var(--outside-scale))",
-                  transformOrigin: "center",
-                  clipPath:
-                    "inset(0 0 calc(100% - var(--outside-cut)) 0)",
-                }}
-              />
             </div>
-          ) : (
-            <div className="aspect-[3/4] w-full rounded-2xl border border-dashed border-ink-900/20 bg-bone-50 flex items-center justify-center text-[12px] uppercase tracking-[0.28em] text-ink-500 text-center px-6">
-              Drop transparent
-              <br />
-              jaime-hero.png
-              <br />
-              in /public/images
-            </div>
-          )}
-        </motion.div>
-      </motion.div>
+            <figcaption className="mt-2 flex items-start justify-end gap-2 pr-4">
+              <Doodle
+                paths={ARROW}
+                viewBox="0 0 100 70"
+                delay={1.4}
+                className="h-10 w-14 -scale-x-100 rotate-180"
+              />
+              <span className="hand text-[1.5rem] -rotate-2">
+                that&apos;s me — usually
+                <br />
+                sketching something
+              </span>
+            </figcaption>
+          </motion.figure>
+        </div>
+      </div>
     </section>
   );
 }

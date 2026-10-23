@@ -2,13 +2,49 @@
 
 import { useState } from "react";
 import Reveal from "./Reveal";
+import SectionTitle from "./SectionTitle";
+
+const EMAIL = "jaime.rabazofernandez@gmail.com";
+const CV_SRC = `${process.env.NEXT_PUBLIC_BASE_PATH || ""}/cv/Jaime-Rabazo-CV.pdf`;
+
+// Deterministic, decorative barcode derived from a string.
+function Barcode({ value }: { value: string }) {
+  const bars: { x: number; w: number }[] = [];
+  let x = 0;
+  for (const ch of value) {
+    const c = ch.charCodeAt(0);
+    for (let k = 0; k < 3; k++) {
+      const w = ((c >> k) & 3) + 1;
+      bars.push({ x, w });
+      x += w + (((c >> (k + 2)) & 1) + 1);
+    }
+  }
+  return (
+    <svg viewBox={`0 0 ${x} 40`} preserveAspectRatio="none" className="h-16 w-full text-ink-900" aria-hidden>
+      {bars.map((b, i) => (
+        <rect key={i} x={b.x} y={0} width={b.w} height={40} fill="currentColor" />
+      ))}
+    </svg>
+  );
+}
+
+function Field({ label, value, big = false }: { label: string; value: string; big?: boolean }) {
+  return (
+    <div>
+      <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-ink-500">{label}</p>
+      <p className={big ? "mt-1 font-serif text-[2.25rem] leading-none text-ink-900" : "mt-1 font-mono text-[14px] uppercase text-ink-900"}>
+        {value}
+      </p>
+    </div>
+  );
+}
 
 export default function Contact() {
   const [copied, setCopied] = useState(false);
 
   const copyEmail = async () => {
     try {
-      await navigator.clipboard.writeText("jaime.rabazofernandez@gmail.com");
+      await navigator.clipboard.writeText(EMAIL);
       setCopied(true);
       setTimeout(() => setCopied(false), 1800);
     } catch {
@@ -17,62 +53,82 @@ export default function Contact() {
   };
 
   return (
-    <section
-      id="contact"
-      className="relative py-32 md:py-48 px-6 md:px-10 border-t border-ink-900/8"
-    >
+    <section id="contact" className="relative px-5 md:px-10 py-20 md:py-28">
       <div className="mx-auto max-w-6xl">
-        <Reveal>
-          <div className="flex items-center gap-3 text-[11px] uppercase tracking-[0.32em] text-ink-500">
-            <span className="tabular text-ink-900">06</span>
-            <span className="h-px w-8 accent-rule" />
-            <span>Contact</span>
+        <SectionTitle
+          kicker="Final call"
+          title="Got a seat on your team?"
+          note="this is the part where you email me"
+        />
+
+        <Reveal className="mt-10">
+          <div className="relative grid overflow-hidden rounded-[22px] bg-paper-light shadow-[0_30px_60px_-40px_rgba(21,21,21,0.6)] border border-ink-900/10 md:grid-cols-[1fr_17rem]">
+            <div className="p-6 md:p-10">
+              <div className="flex items-center justify-between font-mono text-[11px] uppercase tracking-[0.2em]">
+                <span className="text-ink-900 font-bold">Boarding pass</span>
+                <span className="text-ink-500">JR · 2026</span>
+              </div>
+
+              <div className="mt-8 flex items-end gap-6">
+                <Field label="From" value="MAD" big />
+                <span aria-hidden className="pb-2 text-2xl text-pen">✈</span>
+                <Field label="To" value="You?" big />
+              </div>
+
+              <div className="mt-8 grid grid-cols-2 gap-6 md:grid-cols-4">
+                <Field label="Passenger" value="J. Rabazo" />
+                <Field label="Class" value="Data · AI · Strategy" />
+                <Field label="Available" value="Now" />
+                <Field label="Relocation" value="Yes" />
+              </div>
+            </div>
+
+            {/* Stub */}
+            <div className="relative border-t-2 border-dashed border-ink-900/20 p-6 md:border-l-2 md:border-t-0 md:p-8 flex flex-col justify-between gap-6">
+              <span aria-hidden className="absolute -left-3 -top-3 hidden h-6 w-6 rounded-full bg-paper md:block" />
+              <span aria-hidden className="absolute -bottom-3 -left-3 hidden h-6 w-6 rounded-full bg-paper md:block" />
+              <Field label="Gate" value="Your inbox" />
+              <Barcode value={EMAIL} />
+            </div>
           </div>
         </Reveal>
 
-        <Reveal delay={0.05}>
-          <h2 className="mt-10 font-display font-semibold text-huge text-ink-900">
-            Get in touch
-          </h2>
-        </Reveal>
-
         <Reveal delay={0.1}>
-          <p className="mt-8 max-w-2xl text-lg md:text-xl text-ink-700 tracking-tight2">
-            Open to roles in data, consulting and technology strategy. Based in
-            Madrid, open to relocate.
-          </p>
-        </Reveal>
-
-        <Reveal delay={0.15}>
-          <div className="mt-10 flex flex-wrap items-center gap-3">
+          <div className="mt-8 flex flex-wrap items-center gap-3">
             <a
-              href="mailto:jaime.rabazofernandez@gmail.com"
-              className="inline-flex items-center gap-2 rounded-full bg-ink-900 text-bone-50 px-6 py-3.5 text-sm font-medium hover:bg-copper-600 transition-colors"
+              href={`mailto:${EMAIL}`}
+              className="inline-flex items-center gap-2 rounded-full bg-ink-900 px-6 py-3.5 text-sm font-medium text-paper hover:bg-pen transition-colors"
             >
-              jaime.rabazofernandez@gmail.com
-              <span aria-hidden>→</span>
+              {EMAIL} <span aria-hidden>→</span>
             </a>
             <button
               onClick={copyEmail}
-              className="inline-flex items-center gap-2 rounded-full border border-ink-900/15 px-6 py-3.5 text-sm font-medium text-ink-900 hover:bg-ink-900/5 transition-colors"
+              className="inline-flex items-center rounded-full border border-ink-900/20 px-6 py-3.5 text-sm font-medium text-ink-900 hover:border-ink-900/40 transition-colors"
             >
               {copied ? "Copied ✓" : "Copy email"}
             </button>
             <a
+              href={CV_SRC}
+              download
+              className="inline-flex items-center gap-2 rounded-full border border-ink-900/20 px-6 py-3.5 text-sm font-medium text-ink-900 hover:border-ink-900/40 transition-colors"
+            >
+              Download CV <span aria-hidden className="text-ink-400">↓</span>
+            </a>
+            <a
               href="https://www.linkedin.com/in/jaime-rabazo-fernandez/"
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-2 rounded-full border border-ink-900/15 px-6 py-3.5 text-sm font-medium text-ink-900 hover:bg-ink-900/5 transition-colors"
+              className="px-3 py-3.5 text-sm font-medium text-ink-600 hover:text-ink-900 link-reveal"
             >
-              LinkedIn
+              LinkedIn ↗
             </a>
             <a
               href="https://github.com/jaimerabazo"
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-2 rounded-full border border-ink-900/15 px-6 py-3.5 text-sm font-medium text-ink-900 hover:bg-ink-900/5 transition-colors"
+              className="px-3 py-3.5 text-sm font-medium text-ink-600 hover:text-ink-900 link-reveal"
             >
-              GitHub
+              GitHub ↗
             </a>
           </div>
         </Reveal>

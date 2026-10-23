@@ -98,11 +98,67 @@ html.lenis body {
 .flap-tile::after {
   content: "";
   position: absolute;
+  z-index: 3;
   left: 0;
   right: 0;
   top: 50%;
   height: 1px;
   background: rgba(0, 0, 0, 0.75);
+}
+
+/* Mechanical flap: two halves, the top one folds down over its hinge */
+.flap-tile {
+  perspective: 3em;
+}
+.flap-half {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 50%;
+  overflow: hidden;
+  backface-visibility: hidden;
+}
+.flap-top {
+  top: 0;
+  border-radius: 0.08em 0.08em 0 0;
+  background: #26262b;
+}
+.flap-bottom {
+  bottom: 0;
+  border-radius: 0 0 0.08em 0.08em;
+  background: #1d1d21;
+}
+.flap-text {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 200%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.flap-bottom .flap-text {
+  top: -100%;
+}
+.flap-fold-top {
+  z-index: 2;
+  transform-origin: 50% 100%;
+  animation: flap-fold-top var(--flap-ms) ease-in forwards;
+}
+.flap-fold-bottom {
+  z-index: 2;
+  transform-origin: 50% 0%;
+  transform: rotateX(90deg);
+  animation: flap-fold-bottom var(--flap-ms) ease-out var(--flap-ms) forwards;
+}
+@keyframes flap-fold-top {
+  from { transform: rotateX(0deg); filter: brightness(1); }
+  to { transform: rotateX(-90deg); filter: brightness(0.55); }
+}
+@keyframes flap-fold-bottom {
+  from { transform: rotateX(90deg); filter: brightness(1.4); }
+  to { transform: rotateX(0deg); filter: brightness(1); }
 }
 
 /* Link underline reveal */

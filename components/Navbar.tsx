@@ -9,6 +9,7 @@ const links = [
   { href: "#route", label: "Route" },
   { href: "#packing", label: "Packing list" },
   { href: "#contact", label: "Contact" },
+  { href: "#book", label: "Book a call" },
 ];
 
 const CV_SRC = `${process.env.NEXT_PUBLIC_BASE_PATH || ""}/cv/Jaime-Rabazo-CV.pdf`;
@@ -40,7 +41,7 @@ export default function Navbar() {
             <span className="flap-tile">R</span>
           </a>
 
-          <ul className="hidden items-center gap-7 md:flex font-mono text-[12px] uppercase tracking-[0.12em]">
+          <ul className="hidden items-center gap-7 lg:flex whitespace-nowrap font-mono text-[12px] uppercase tracking-[0.12em]">
             {links.map((l) => (
               <li key={l.href}>
                 <a href={l.href} className="text-ink-600 hover:text-ink-900 transition-colors link-reveal">
@@ -50,7 +51,7 @@ export default function Navbar() {
             ))}
           </ul>
 
-          <div className="hidden md:flex items-center gap-2">
+          <div className="hidden lg:flex items-center gap-2 whitespace-nowrap">
             <a
               href={CV_SRC}
               download
@@ -69,7 +70,7 @@ export default function Navbar() {
           <button
             aria-label="Toggle menu"
             aria-expanded={open}
-            className="md:hidden p-2 -mr-2"
+            className="lg:hidden p-2 -mr-2"
             onClick={() => setOpen((v) => !v)}
           >
             <div className="flex flex-col gap-[5px]">
@@ -88,7 +89,7 @@ export default function Navbar() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-40 bg-paper/98 backdrop-blur-md md:hidden"
+            className="fixed inset-0 z-40 bg-paper/98 backdrop-blur-md lg:hidden"
           >
             <ul className="flex h-full flex-col items-center justify-center gap-7">
               {links.map((l, i) => (

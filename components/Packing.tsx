@@ -14,7 +14,6 @@ const carryOn: { title: string; items: string[] }[] = [
 const offDuty = [
   { icon: "train", label: "Trains", note: "will talk timetables" },
   { icon: "plane", label: "Aviation", note: "window seat, always" },
-  { icon: "pencil", label: "Drawing", note: "always sketching" },
   { icon: "music", label: "Choir", note: "NU Choral Society" },
   { icon: "mask", label: "Acting & public speaking", note: "stage > slides" },
   { icon: "brick", label: "FIRST LEGO League", note: "coach & judge" },

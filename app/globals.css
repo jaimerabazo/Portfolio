@@ -20,7 +20,7 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-/* Sketchbook dot grid */
+/* Whiteboard dot grid */
 body {
   min-height: 100svh;
   background-image: radial-gradient(rgba(21, 21, 21, 0.085) 1px, transparent 1px);

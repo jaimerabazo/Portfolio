@@ -48,7 +48,6 @@ export default function Hero() {
           transition={{ duration: 0.8 }}
           className="flex flex-wrap gap-x-5 gap-y-1 font-mono text-[11px] uppercase tracking-[0.18em] text-ink-500"
         >
-          <span>MAD · 40.42°N 3.70°W</span>
           <span>
             Madrid time <MadridClock />
           </span>
@@ -73,8 +72,8 @@ export default function Hero() {
                   <SplitFlap text="RABAZO" tiles step={80} delay={0.45} />
                 </span>
               </span>
-              <span className="mt-3 flex justify-between gap-6 px-1 font-mono text-[10px] md:text-[11px] tracking-[0.2em] text-flap/60">
-                <span>PLATFORM 1</span>
+              <span className="mt-3 flex justify-between gap-6 whitespace-nowrap px-1 font-mono text-[10px] md:text-[11px] tracking-[0.2em] text-flap/60">
+                <span className="hidden sm:inline">PLATFORM 1</span>
                 <span>CS + BUSINESS · ML + AI</span>
               </span>
             </motion.h1>
@@ -91,22 +90,23 @@ export default function Hero() {
                 </span>
               </p>
               <p className="mt-6 max-w-xl text-[17px] leading-relaxed text-ink-600">
-                I&apos;ve put ML into production across Spain&apos;s mobile
-                network at Telefónica, and built an AI tool at Telefónica Tech
-                that turned a{" "}
-                <span className="relative inline-block whitespace-nowrap text-ink-900">
-                  three-hour
+                At Telefónica I built ML that forecasts KPIs across Spain&apos;s
+                mobile network, and automated the work around it — giving a
+                20-person team back{" "}
+                <span className="relative inline-block whitespace-nowrap font-medium text-ink-900">
+                  ~160 hours a month
                   <Doodle
                     paths={CIRCLE}
                     viewBox="0 0 200 64"
                     delay={1.2}
                     strokeWidth={1.8}
                     stretch
-                    className="pointer-events-none absolute -left-3 -top-2 h-[calc(100%+1rem)] w-[calc(100%+1.5rem)]"
+                    className="pointer-events-none absolute -left-2 -top-2 h-[calc(100%+1rem)] w-[calc(100%+1rem)]"
                   />
-                </span>{" "}
-                tender review into five minutes. Looking for the next place to
-                do that kind of work.
+                </span>
+                , now running nationwide. Then at Telefónica Tech I built an AI
+                tool for public tenders. Looking for the next place to do that
+                kind of work.
               </p>
 
               <div className="mt-9 flex flex-wrap items-center gap-3">
@@ -185,9 +185,9 @@ export default function Hero() {
                 className="h-10 w-14 -scale-x-100 rotate-180"
               />
               <span className="hand text-[1.5rem] -rotate-2">
-                that&apos;s me — usually
+                that&apos;s me,
                 <br />
-                sketching something
+                mid-wink
               </span>
             </figcaption>
           </motion.figure>

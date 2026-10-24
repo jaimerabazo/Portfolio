@@ -5,7 +5,7 @@ import { useRef } from "react";
 import Reveal from "./Reveal";
 import SectionTitle from "./SectionTitle";
 
-// Not a real map — a sketch of the route: Madrid → Boston → Madrid → Copenhagen → Madrid.
+// Not a real map — a hand-drawn take on the route: Madrid → Boston → Madrid → Copenhagen → Madrid.
 const ROUTE =
   "M560 330 C 430 130, 250 110, 150 175 C 260 310, 430 370, 560 330 C 610 230, 680 130, 790 95 C 800 210, 700 310, 560 330";
 

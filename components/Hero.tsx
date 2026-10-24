@@ -73,7 +73,7 @@ export default function Hero() {
                 </span>
               </span>
               <span className="mt-3 flex justify-between gap-6 whitespace-nowrap px-1 font-mono text-[10px] md:text-[11px] tracking-[0.2em] text-flap/60">
-                <span className="hidden sm:inline">PLATFORM 1</span>
+                <span>GATE A24</span>
                 <span>CS + BUSINESS · ML + AI</span>
               </span>
             </motion.h1>
@@ -115,6 +115,12 @@ export default function Hero() {
                   className="inline-flex items-center gap-2 rounded-full bg-ink-900 px-6 py-3.5 text-sm font-medium text-paper hover:bg-pen transition-colors"
                 >
                   Email me <span aria-hidden>→</span>
+                </a>
+                <a
+                  href="#contact"
+                  className="inline-flex items-center gap-2 rounded-full border border-ink-900/20 bg-paper-light px-6 py-3.5 text-sm font-medium text-ink-900 hover:border-ink-900/40 transition-colors"
+                >
+                  Book a call <span aria-hidden className="text-pen">✈</span>
                 </a>
                 <a
                   href={cvSrc}

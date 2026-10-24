@@ -8,8 +8,7 @@ const links = [
   { href: "#logbook", label: "Logbook" },
   { href: "#route", label: "Route" },
   { href: "#packing", label: "Packing list" },
-  { href: "#contact", label: "Contact" },
-  { href: "#book", label: "Book a call" },
+  { href: "#contact", label: "Book a call" },
 ];
 
 const CV_SRC = `${process.env.NEXT_PUBLIC_BASE_PATH || ""}/cv/Jaime-Rabazo-CV.pdf`;

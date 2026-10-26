@@ -167,7 +167,7 @@ html.lenis body {
     linear-gradient(180deg, rgba(255, 255, 255, 0.5), transparent 40%),
     #f6f4ee;
   color: #1c1c1c;
-  border-radius: 6px;
+  border-radius: 25px;
   text-shadow: 0 0 0.6px rgba(28, 28, 28, 0.55);
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.8) inset,

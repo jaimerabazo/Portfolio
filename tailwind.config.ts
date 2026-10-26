@@ -32,6 +32,11 @@ const config: Config = {
         board: "#18181b",
         flap: "#f4c84a",
         signal: "#e4572e",
+        // Boarding pass livery bands
+        livery: {
+          DEFAULT: "#1c2747",
+          gold: "#d9b45f",
+        },
       },
       letterSpacing: {
         tightest: "-0.04em",

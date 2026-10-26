@@ -25,8 +25,8 @@ const fares: Fare[] = [
   { code: "L", minutes: 90, label: "1 h 30", box: "1H30", slug: "90min" },
 ];
 
-const BOOKING_REF = "2D2026A24";
-const FLIGHT = "2D 024";
+const BOOKING_REF = "JR2026A24";
+const FLIGHT = "JR 024";
 
 const fmtTime = new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Madrid", hour: "2-digit", minute: "2-digit" });
 const fmtDay = new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Madrid", day: "2-digit" });
@@ -110,22 +110,17 @@ function PenCircle({ k }: { k: string }) {
   );
 }
 
+// Same J·R flap-tile mark as the navbar's back-to-top logo.
 function Brand({ small = false }: { small?: boolean }) {
   return (
-    <span className="inline-flex items-center gap-2.5 font-mono font-bold">
-      <span
-        className={`grid shrink-0 place-items-center rounded-full border-[2.5px] border-ink-900 leading-none ${
-          small ? "h-9 w-9 text-[15px]" : "h-11 w-11 text-[19px] md:h-12 md:w-12 md:text-[21px]"
-        }`}
-      >
-        2°
-      </span>
-      <span className={`leading-[0.95] tracking-[0.14em] ${small ? "text-[13px]" : "text-[15px] md:text-[18px]"}`}>
-        TWO DEGREES
-        <span className={`block font-medium tracking-[0.42em] ${small ? "text-[9px]" : "text-[10px] md:text-[11px]"}`}>
-          AIRWAYS
-        </span>
-      </span>
+    <span
+      aria-label="Jaime Rabazo"
+      className={`board inline-flex shrink-0 gap-[2px] rounded-md p-1 font-mono font-bold normal-case [text-shadow:none] ${
+        small ? "text-[15px]" : "text-[20px] md:text-[24px]"
+      }`}
+    >
+      <span className="flap-tile">J</span>
+      <span className="flap-tile">R</span>
     </span>
   );
 }
@@ -174,7 +169,7 @@ export default function Contact() {
               <div className="flex items-start justify-between gap-4">
                 <Brand />
                 <div className="hidden text-center sm:block">
-                  <p className="text-[15px] md:text-[17px] font-bold tracking-[0.08em]">Two Degrees Airways</p>
+                  <p className="text-[15px] md:text-[17px] font-bold tracking-[0.08em]">Jaime Rabazo</p>
                   <p className="mt-1 text-[12px] md:text-[13px] font-bold tracking-[0.1em]">Boarding pass</p>
                 </div>
                 <Seal />
@@ -238,7 +233,7 @@ export default function Contact() {
               <div className="mt-5 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
                 <fieldset>
                   <legend className="text-[12px] md:text-[13px] leading-snug">
-                    2D010524 {date} MAD MADRID
+                    JR010524 {date} MAD MADRID
                     <br />
                     Please select flight length
                   </legend>

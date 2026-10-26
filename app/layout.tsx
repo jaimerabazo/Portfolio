@@ -33,17 +33,20 @@ const hand = Caveat({
   display: "swap",
 });
 
+// Switch to https://jaimerabazo.com (and restore public/CNAME) once the domain is set up.
+const SITE_URL = "https://jaimerabazo.github.io";
+
 export const metadata: Metadata = {
   title: "Jaime Rabazo — ML, AI & Technology Strategy",
   description:
     "Jaime Rabazo Fernández — Computer Science + Business Administration (UC3M). Built production ML at Telefónica and an AI tender analysis platform at Telefónica Tech.",
-  metadataBase: new URL("https://jaimerabazo.com"),
+  metadataBase: new URL(SITE_URL),
   alternates: { canonical: "/" },
   openGraph: {
     title: "Jaime Rabazo — ML, AI & Technology Strategy",
     description:
       "Production ML across 52,000+ mobile cells. An AI platform that cut RFP triage from 3 hours to 5 minutes.",
-    url: "https://jaimerabazo.com",
+    url: SITE_URL,
     type: "website",
   },
 };

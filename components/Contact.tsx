@@ -76,25 +76,6 @@ function Label({ text }: { text: string }) {
   );
 }
 
-// Round "alliance" seal: ring text slowly orbiting a plane.
-function Seal() {
-  const ring = "AVAILABLE NOW · MADRID · OR ANYWHERE · ";
-  return (
-    <span className="relative grid h-16 w-16 shrink-0 place-items-center rounded-full bg-ink-900 text-paper-light md:h-20 md:w-20">
-      <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full animate-[spin_18s_linear_infinite]" aria-hidden>
-        <defs>
-          <path id="seal-ring" d="M50 50 m-36 0 a36 36 0 1 1 72 0 a36 36 0 1 1 -72 0" />
-        </defs>
-        <text fontSize="10.5" fontWeight="700" letterSpacing="1.6" fill="currentColor" className="font-mono">
-          <textPath href="#seal-ring">{ring}</textPath>
-        </text>
-      </svg>
-      <span aria-hidden className="text-[18px] text-flap">✈</span>
-      <span className="sr-only">Available now, Madrid or anywhere</span>
-    </span>
-  );
-}
-
 // Hand-drawn ballpoint circle around a value; re-draws when `k` changes.
 function PenCircle({ k }: { k: string }) {
   return (
@@ -172,7 +153,6 @@ export default function Contact() {
                   <p className="text-[15px] md:text-[17px] font-bold tracking-[0.08em]">Jaime Rabazo</p>
                   <p className="mt-1 text-[12px] md:text-[13px] font-bold tracking-[0.1em]">Boarding pass</p>
                 </div>
-                <Seal />
               </div>
 
               <div className="mt-6 grid gap-4 sm:grid-cols-2 sm:gap-8">

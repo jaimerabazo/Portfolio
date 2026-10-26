@@ -1,6 +1,7 @@
 "use client";
 
-import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
+import { QRCodeSVG } from "qrcode.react";
 import { useInView } from "framer-motion";
 import Reveal from "./Reveal";
 import SectionTitle from "./SectionTitle";
@@ -43,35 +44,10 @@ function useNow() {
   return now;
 }
 
-// Decorative 2D "PDF417-ish" code, deterministic for a given seed.
-function MatrixCode({ seed, cols, rows, className }: { seed: string; cols: number; rows: number; className?: string }) {
-  const cells = useMemo(() => {
-    let h = 2166136261;
-    for (const ch of seed) h = Math.imul(h ^ ch.charCodeAt(0), 16777619);
-    const out: { x: number; y: number }[] = [];
-    for (let y = 0; y < rows; y++) {
-      for (let x = 0; x < cols; x++) {
-        h ^= h << 13;
-        h ^= h >>> 17;
-        h ^= h << 5;
-        if ((h >>> 0) % 100 < 52) out.push({ x, y });
-      }
-    }
-    return out;
-  }, [seed, cols, rows]);
-  return (
-    <svg viewBox={`0 0 ${cols} ${rows}`} preserveAspectRatio="none" shapeRendering="crispEdges" className={className} aria-hidden>
-      {cells.map((c, i) => (
-        <rect key={i} x={c.x} y={c.y} width={1} height={1} fill="currentColor" />
-      ))}
-    </svg>
-  );
-}
-
 // Navy livery band across the top and bottom; columns line up with the body
 // so the stub's perforation runs straight through.
 const BAND =
-  "grid bg-livery text-paper-light [text-shadow:none] md:grid-cols-[1fr_4.5rem_19rem]";
+  "grid bg-livery text-paper-light [text-shadow:none] md:grid-cols-[1fr_23rem]";
 const STUB_EDGE = "border-l-2 border-dashed border-paper-light/25";
 
 function Field({ label, value, small = false }: { label: string; value: ReactNode; small?: boolean }) {
@@ -176,13 +152,12 @@ export default function Contact() {
                   Fast track
                 </span>
               </div>
-              <div aria-hidden className="hidden md:block" />
               <div className={`${STUB_EDGE} hidden items-center px-6 md:flex`}>
                 <span className="text-[11px] font-bold tracking-[0.3em] text-livery-gold">Boarding pass</span>
               </div>
             </div>
 
-            <div className="grid md:grid-cols-[1fr_4.5rem_19rem]">
+            <div className="grid md:grid-cols-[1fr_23rem]">
               {/* ── Main coupon ─────────────────────────────── */}
               <div className="p-5 md:p-8">
                 {/* Who, booking and flight */}
@@ -298,12 +273,6 @@ export default function Contact() {
                 </div>
               </div>
 
-              {/* ── 2D code ─────────────────────────────── */}
-              <div className="flex items-center justify-center px-5 pb-5 md:px-0 md:py-8">
-                <MatrixCode seed={`${EMAIL}/${fare.slug}`} cols={16} rows={64} className="hidden h-full max-h-[22rem] w-14 text-ink-900 md:block" />
-                <MatrixCode seed={`${EMAIL}/${fare.slug}`} cols={64} rows={10} className="h-12 w-full text-ink-900 md:hidden" />
-              </div>
-
               {/* ── Stub ─────────────────────────────── */}
               <div className="relative flex flex-col border-t-2 border-dashed border-ink-900/30 p-5 md:border-l-2 md:border-t-0 md:p-6">
                 <p className="text-[11px] font-bold tracking-[0.3em] text-livery md:hidden">Boarding pass</p>
@@ -334,11 +303,30 @@ export default function Contact() {
                   </div>
                 </div>
 
+                {/* Scan with a phone to book the same call there */}
+                <div className="mt-5 flex items-center gap-4">
+                  <QRCodeSVG
+                    value={bookHref}
+                    size={104}
+                    level="M"
+                    bgColor="transparent"
+                    fgColor="#151515"
+                    title={`QR code: book a ${fare.label} call on Cal.com`}
+                    className="h-[104px] w-[104px] shrink-0"
+                  />
+                  <div className="leading-snug">
+                    <p className="text-[13px] font-bold tracking-[0.08em]">Scan to board</p>
+                    <p className="mt-1 text-[11px] normal-case text-ink-700">
+                      Book the {fare.label} call from your phone
+                    </p>
+                  </div>
+                </div>
+
                 <a
                   href={bookHref}
                   target="_blank"
                   rel="noreferrer"
-                  className="mt-auto flex items-center justify-between bg-livery px-4 py-3 text-[13px] font-bold tracking-[0.1em] text-paper-light transition-colors hover:bg-pen max-md:mt-5"
+                  className="mt-5 flex items-center justify-between bg-livery px-4 py-3 text-[13px] font-bold tracking-[0.1em] text-paper-light transition-colors hover:bg-pen max-md:mt-5"
                 >
                   Board · Book {fare.label}
                   <span aria-hidden className="text-livery-gold">→</span>
@@ -357,7 +345,6 @@ export default function Contact() {
                 </span>
                 <span className="text-paper-light/70 md:hidden">ETKT 160 0052 0013</span>
               </div>
-              <div aria-hidden className="hidden md:block" />
               <div className={`${STUB_EDGE} hidden items-center px-6 text-[10px] tracking-[0.12em] text-paper-light/70 md:flex md:text-[11px]`}>
                 ETKT 160 0052 0013
               </div>

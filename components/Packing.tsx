@@ -1,8 +1,9 @@
 "use client";
 
+import clsx from "clsx";
 import Reveal from "./Reveal";
 import SectionTitle from "./SectionTitle";
-import { Doodle, ICONS } from "./Doodles";
+import { Doodle, Hand, ICONS } from "./Doodles";
 
 const carryOn: { title: string; items: string[] }[] = [
   { title: "Code", items: ["Python", "Pandas", "Scikit-learn", "PySpark", "SQL", "Java", "C", "Kotlin", "MATLAB"] },
@@ -28,7 +29,7 @@ export default function Packing() {
         <div className="mt-12 grid gap-12 lg:grid-cols-[1.1fr_1fr] lg:gap-16">
           <Reveal>
             <h3 className="font-mono text-[11px] uppercase tracking-[0.2em] text-ink-500">
-              Carry-on · work
+              Carry-on · always with me
             </h3>
             <dl className="mt-4 border-t border-ink-900/15">
               {carryOn.map((g) => (
@@ -49,15 +50,20 @@ export default function Packing() {
             <h3 className="font-mono text-[11px] uppercase tracking-[0.2em] text-ink-500">
               Checked bag · off duty
             </h3>
-            <ul className="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {/* Half-width columns so a short last row sits centred under the gaps above. */}
+            <ul className="mt-4 grid grid-cols-4 sm:grid-cols-6 gap-3">
               {offDuty.map((o, i) => (
                 <li
                   key={o.label}
-                  className="flex flex-col rounded-xl border border-ink-900/10 bg-paper-light p-4"
+                  className={clsx(
+                    "col-span-2 flex flex-col rounded-xl border border-ink-900/10 bg-paper-light p-4",
+                    i === 3 && "sm:col-start-2",
+                    i === 4 && "col-start-2 sm:col-start-auto"
+                  )}
                 >
                   <Doodle paths={ICONS[o.icon]} viewBox="0 0 64 64" delay={i * 0.1} className="h-11 w-11" />
                   <span className="mt-3 text-[14px] font-medium leading-snug text-ink-900">{o.label}</span>
-                  <span className="hand mt-1 text-[1.2rem]">{o.note}</span>
+                  <Hand as="span" className="mt-1 text-[1.2rem]">{o.note}</Hand>
                 </li>
               ))}
             </ul>

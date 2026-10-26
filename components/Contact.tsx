@@ -1,33 +1,36 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useInView } from "framer-motion";
 import Reveal from "./Reveal";
 import SectionTitle from "./SectionTitle";
+import { CIRCLE, Doodle, Hand } from "./Doodles";
 
 const EMAIL = "jaime.rabazofernandez@gmail.com";
 const CAL_USERNAME = "jaimerabazo";
 const CV_SRC = `${process.env.NEXT_PUBLIC_BASE_PATH || ""}/cv/Jaime-Rabazo-CV.pdf`;
 
 type Fare = {
-  name: string;
+  code: string;
   minutes: number;
   label: string;
+  box: string;
   slug: string;
-  description: string;
 };
 
 // Each fare is a Cal.com event type: cal.com/<username>/<slug>
 const fares: Fare[] = [
-  { name: "Quick hop", minutes: 30, label: "30 min", slug: "30min", description: "An intro chat — who you are, what you're looking for." },
-  { name: "Short-haul", minutes: 60, label: "1 h", slug: "60min", description: "Go deeper into a role, a team or a project." },
-  { name: "Long-haul", minutes: 90, label: "1 h 30", slug: "90min", description: "Case discussion, technical deep-dive or a proper interview." },
+  { code: "Q", minutes: 30, label: "30 min", box: "30MIN", slug: "30min" },
+  { code: "S", minutes: 60, label: "1 h", box: "1H", slug: "60min" },
+  { code: "L", minutes: 90, label: "1 h 30", box: "1H30", slug: "90min" },
 ];
 
-const madridTime = new Intl.DateTimeFormat("en-GB", {
-  timeZone: "Europe/Madrid",
-  hour: "2-digit",
-  minute: "2-digit",
-});
+const BOOKING_REF = "2D2026A24";
+const FLIGHT = "2D 024";
+
+const fmtTime = new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Madrid", hour: "2-digit", minute: "2-digit" });
+const fmtDay = new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Madrid", day: "2-digit" });
+const fmtMonth = new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Madrid", month: "short" });
 
 // Ticks every 15 s; null until mounted so server and client markup match.
 function useNow() {
@@ -40,33 +43,90 @@ function useNow() {
   return now;
 }
 
-// Deterministic, decorative barcode derived from a string.
-function Barcode({ value }: { value: string }) {
-  const bars: { x: number; w: number }[] = [];
-  let x = 0;
-  for (const ch of value) {
-    const c = ch.charCodeAt(0);
-    for (let k = 0; k < 3; k++) {
-      const w = ((c >> k) & 3) + 1;
-      bars.push({ x, w });
-      x += w + (((c >> (k + 2)) & 1) + 1);
+// Decorative 2D "PDF417-ish" code, deterministic for a given seed.
+function MatrixCode({ seed, cols, rows, className }: { seed: string; cols: number; rows: number; className?: string }) {
+  const cells = useMemo(() => {
+    let h = 2166136261;
+    for (const ch of seed) h = Math.imul(h ^ ch.charCodeAt(0), 16777619);
+    const out: { x: number; y: number }[] = [];
+    for (let y = 0; y < rows; y++) {
+      for (let x = 0; x < cols; x++) {
+        h ^= h << 13;
+        h ^= h >>> 17;
+        h ^= h << 5;
+        if ((h >>> 0) % 100 < 52) out.push({ x, y });
+      }
     }
-  }
+    return out;
+  }, [seed, cols, rows]);
   return (
-    <svg viewBox={`0 0 ${x} 40`} preserveAspectRatio="none" className="h-14 w-full text-ink-900" aria-hidden>
-      {bars.map((b, i) => (
-        <rect key={i} x={b.x} y={0} width={b.w} height={40} fill="currentColor" />
+    <svg viewBox={`0 0 ${cols} ${rows}`} preserveAspectRatio="none" shapeRendering="crispEdges" className={className} aria-hidden>
+      {cells.map((c, i) => (
+        <rect key={i} x={c.x} y={c.y} width={1} height={1} fill="currentColor" />
       ))}
     </svg>
   );
 }
 
-function Field({ label, value }: { label: string; value: string }) {
+function Label({ text }: { text: string }) {
   return (
-    <div>
-      <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-ink-500">{label}</p>
-      <p className="mt-1 font-mono text-[14px] uppercase text-ink-900">{value}</p>
-    </div>
+    <span className="block text-[9px] md:text-[10px] leading-tight tracking-[0.08em] text-ink-700">
+      {text}
+    </span>
+  );
+}
+
+// Round "alliance" seal: ring text slowly orbiting a plane.
+function Seal() {
+  const ring = "AVAILABLE NOW · MADRID · OR ANYWHERE · ";
+  return (
+    <span className="relative grid h-16 w-16 shrink-0 place-items-center rounded-full bg-ink-900 text-paper-light md:h-20 md:w-20">
+      <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full animate-[spin_18s_linear_infinite]" aria-hidden>
+        <defs>
+          <path id="seal-ring" d="M50 50 m-36 0 a36 36 0 1 1 72 0 a36 36 0 1 1 -72 0" />
+        </defs>
+        <text fontSize="10.5" fontWeight="700" letterSpacing="1.6" fill="currentColor" className="font-mono">
+          <textPath href="#seal-ring">{ring}</textPath>
+        </text>
+      </svg>
+      <span aria-hidden className="text-[18px] text-flap">✈</span>
+      <span className="sr-only">Available now, Madrid or anywhere</span>
+    </span>
+  );
+}
+
+// Hand-drawn ballpoint circle around a value; re-draws when `k` changes.
+function PenCircle({ k }: { k: string }) {
+  return (
+    <Doodle
+      key={k}
+      mode="mount"
+      paths={CIRCLE}
+      viewBox="0 0 200 64"
+      stretch
+      strokeWidth={1.6}
+      className="pointer-events-none absolute -left-2 -top-1.5 h-[calc(100%+0.75rem)] w-[calc(100%+1rem)]"
+    />
+  );
+}
+
+function Brand({ small = false }: { small?: boolean }) {
+  return (
+    <span className="inline-flex items-center gap-2.5 font-mono font-bold">
+      <span
+        className={`grid shrink-0 place-items-center rounded-full border-[2.5px] border-ink-900 leading-none ${
+          small ? "h-9 w-9 text-[15px]" : "h-11 w-11 text-[19px] md:h-12 md:w-12 md:text-[21px]"
+        }`}
+      >
+        2°
+      </span>
+      <span className={`leading-[0.95] tracking-[0.14em] ${small ? "text-[13px]" : "text-[15px] md:text-[18px]"}`}>
+        TWO DEGREES
+        <span className={`block font-medium tracking-[0.42em] ${small ? "text-[9px]" : "text-[10px] md:text-[11px]"}`}>
+          AIRWAYS
+        </span>
+      </span>
+    </span>
   );
 }
 
@@ -74,9 +134,14 @@ export default function Contact() {
   const [fare, setFare] = useState(fares[0]);
   const [copied, setCopied] = useState(false);
   const now = useNow();
+  // Pen marks mount (and draw) only once the pass has been seen, so the first
+  // tick and circles are drawn in front of the reader rather than off-screen.
+  const passRef = useRef<HTMLDivElement>(null);
+  const seen = useInView(passRef, { once: true, amount: 0.4 });
 
-  const departs = now === null ? "--:--" : madridTime.format(now);
-  const arrives = now === null ? "--:--" : madridTime.format(now + fare.minutes * 60_000);
+  const departs = now === null ? "--:--" : fmtTime.format(now);
+  const arrives = now === null ? "--:--" : fmtTime.format(now + fare.minutes * 60_000);
+  const date = now === null ? "--" : `${fmtDay.format(now)}${fmtMonth.format(now).toUpperCase().slice(0, 3)}`;
   const bookHref = `https://cal.com/${CAL_USERNAME}/${fare.slug}`;
 
   const copyEmail = async () => {
@@ -95,109 +160,205 @@ export default function Contact() {
         <SectionTitle
           kicker="Final call"
           title="Got a seat on your team?"
-          note="pick your flight length, then board ✈"
+          note="tick a flight length, then board ✈"
         />
 
         <Reveal className="mt-10">
-          <div className="relative grid overflow-hidden rounded-[22px] border border-ink-900/10 bg-paper-light shadow-[0_30px_60px_-40px_rgba(21,21,21,0.6)] md:grid-cols-[1fr_18rem]">
-            <div className="p-6 md:p-10">
-              <div className="flex items-center justify-between font-mono text-[11px] uppercase tracking-[0.2em]">
-                <span className="font-bold text-ink-900">Boarding pass</span>
-                <span className="text-ink-500">Gate A24</span>
+          <div ref={passRef} className="thermal relative grid font-mono uppercase md:-rotate-[0.6deg] md:grid-cols-[1fr_4.5rem_19rem]">
+            {/* edge notches, like a torn-off roll */}
+            <span aria-hidden className="absolute -left-2 top-[38%] h-5 w-4 rounded-r-full bg-paper" />
+            <span aria-hidden className="absolute -left-2 top-[52%] h-5 w-4 rounded-r-full bg-paper" />
+
+            {/* ── Main coupon ─────────────────────────────── */}
+            <div className="p-5 md:p-8">
+              <div className="flex items-start justify-between gap-4">
+                <Brand />
+                <div className="hidden text-center sm:block">
+                  <p className="text-[15px] md:text-[17px] font-bold tracking-[0.08em]">Two Degrees Airways</p>
+                  <p className="mt-1 text-[12px] md:text-[13px] font-bold tracking-[0.1em]">Boarding pass</p>
+                </div>
+                <Seal />
               </div>
 
-              {/* Route with live times */}
-              <div className="mt-8 flex items-end gap-4 md:gap-6">
-                <div>
-                  <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-ink-500">From · MAD</p>
-                  <p className="mt-1 font-serif text-[2.4rem] md:text-[3rem] leading-none text-ink-900 tabular">{departs}</p>
+              <div className="mt-6 grid gap-4 sm:grid-cols-2 sm:gap-8">
+                <div className="text-[15px] md:text-[17px] leading-snug">
+                  <p>{BOOKING_REF}</p>
+                  <p className="text-[17px] md:text-[20px]">ETKT 160 0052 0013</p>
+                  <p className="mt-1 text-[18px] md:text-[22px] sm:pl-10">Fast track</p>
                 </div>
-                <div className="mb-3 flex-1">
-                  <div className="relative">
-                    <span className="block border-t-2 border-dashed border-ink-900/20" />
-                    <span aria-hidden className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-paper-light px-2 text-pen">
-                      ✈
-                    </span>
-                  </div>
-                  <p className="mt-3 whitespace-nowrap text-center font-mono text-[11px] text-ink-500">
-                    {fare.label}
-                    <span className="hidden sm:inline"> · non-stop</span>
+                <div className="text-[15px] md:text-[17px] leading-snug">
+                  <p>Recruiter/You</p>
+                  <p className="tabular">
+                    {FLIGHT} {fare.code} {date}
+                    {departs}
+                  </p>
+                  <p className="flex justify-between gap-4">
+                    <span>Madrid</span>
+                    <span>MAD</span>
+                  </p>
+                  <p className="flex justify-between gap-4">
+                    <span>Your team</span>
+                    <span>YOU</span>
                   </p>
                 </div>
-                <div className="text-right">
-                  <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-ink-500">To · You</p>
-                  <p className="mt-1 font-serif text-[2.4rem] md:text-[3rem] leading-none text-ink-900 tabular">{arrives}</p>
-                </div>
               </div>
 
-              {/* Fare selector */}
-              <fieldset className="mt-8">
-                <legend className="font-mono text-[10px] uppercase tracking-[0.2em] text-ink-500">
-                  Flight length
-                </legend>
-                <div className="mt-3 grid grid-cols-3 gap-2">
-                  {fares.map((f) => {
-                    const active = f.slug === fare.slug;
-                    return (
-                      <label
-                        key={f.slug}
-                        className={`cursor-pointer rounded-xl border px-3 py-3 text-center transition-colors has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-pen ${
-                          active
-                            ? "border-ink-900 bg-ink-900 text-paper"
-                            : "border-ink-900/15 text-ink-900 hover:border-ink-900/40"
-                        }`}
-                      >
-                        <input
-                          type="radio"
-                          name="fare"
-                          value={f.slug}
-                          checked={active}
-                          onChange={() => setFare(f)}
-                          className="sr-only"
-                        />
-                        <span className="block font-serif text-[1.35rem] leading-none">{f.label}</span>
-                        <span className={`mt-1.5 block font-mono text-[10px] uppercase tracking-[0.14em] ${active ? "text-paper/60" : "text-ink-500"}`}>
-                          {f.name}
-                        </span>
-                      </label>
-                    );
-                  })}
+              {/* Boarding box */}
+              <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-4 border-[1.5px] border-ink-900 px-3 py-3 md:grid-cols-4 md:px-4">
+                <div>
+                  <Label text="Boarding begins" />
+                  <p className="mt-1 text-[28px] md:text-[34px] font-bold leading-none">NOW</p>
                 </div>
-                <p className="mt-4 text-[15px] text-ink-600">{fare.description}</p>
-              </fieldset>
+                <div>
+                  <Label text="Flight length" />
+                  <p className="mt-1 text-[28px] md:text-[34px] font-bold leading-none">
+                    <span className="relative inline-block">
+                      {fare.minutes}
+                      <span className="ml-1 text-[12px] font-bold normal-case">min.</span>
+                      {seen && <PenCircle k={`d-${fare.slug}`} />}
+                    </span>
+                  </p>
+                </div>
+                <div>
+                  <Label text="Boarding gate" />
+                  <p className="mt-1 text-[28px] md:text-[34px] font-bold leading-none">A24</p>
+                  <Label text="Boarding zone" />
+                </div>
+                <div>
+                  <Label text="Seat" />
+                  <p className="mt-1 text-[28px] md:text-[34px] font-bold leading-none">1A</p>
+                  <p className="mt-1 text-[10px] normal-case">window, always</p>
+                </div>
+              </div>
+              <p className="mt-1 text-[10px] md:text-[11px] normal-case">
+                Remarks: OPEN TO RELOCATION · GOOGLE MEET
+              </p>
 
-              <div className="mt-8 grid grid-cols-2 gap-6 md:grid-cols-4">
-                <Field label="Passenger" value="J. Rabazo" />
-                <Field label="Class" value={fare.name} />
-                <Field label="Aircraft" value="Google Meet" />
-                <Field label="Relocation" value="Yes" />
+              {/* Footer: selector + group */}
+              <div className="mt-5 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+                <fieldset>
+                  <legend className="text-[12px] md:text-[13px] leading-snug">
+                    2D010524 {date} MAD MADRID
+                    <br />
+                    Please select flight length
+                  </legend>
+                  <div className="mt-2 flex gap-3">
+                    {fares.map((f) => {
+                      const active = f.slug === fare.slug;
+                      return (
+                        <label
+                          key={f.slug}
+                          className="group cursor-pointer text-center has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-pen"
+                        >
+                          <input
+                            type="radio"
+                            name="fare"
+                            value={f.slug}
+                            checked={active}
+                            onChange={() => setFare(f)}
+                            className="sr-only"
+                          />
+                          <span className="block text-[12px] font-bold">{f.box}</span>
+                          <span
+                            className={`relative mt-0.5 grid h-10 w-14 place-items-center border-[1.5px] border-ink-900 transition-colors ${
+                              active ? "" : "group-hover:bg-ink-900/5"
+                            }`}
+                          >
+                            {active && seen && (
+                              <Doodle
+                                key={`c-${f.slug}`}
+                                mode="mount"
+                                paths={["M8 16 L 16 25 L 32 4"]}
+                                viewBox="0 0 40 30"
+                                strokeWidth={2.6}
+                                className="h-7 w-9"
+                              />
+                            )}
+                          </span>
+                        </label>
+                      );
+                    })}
+                    <Hand as="span" className="self-end pb-1 text-[1.3rem] normal-case">← pick one</Hand>
+                  </div>
+                </fieldset>
+
+                <div className="sm:text-right">
+                  <p className="text-[10px] normal-case">
+                    Baggage &nbsp; Seq/Bn &nbsp; Tag number
+                  </p>
+                  <p className="text-[18px] sm:pr-24">160</p>
+                  <p className="mt-2 text-[30px] md:text-[38px] font-bold leading-none tracking-[0.06em]">Group 1</p>
+                </div>
               </div>
             </div>
 
-            {/* Stub */}
-            <div className="relative flex flex-col justify-between gap-6 border-t-2 border-dashed border-ink-900/20 p-6 md:border-l-2 md:border-t-0 md:p-8">
-              <span aria-hidden className="absolute -left-3 -top-3 hidden h-6 w-6 rounded-full bg-paper md:block" />
-              <span aria-hidden className="absolute -bottom-3 -left-3 hidden h-6 w-6 rounded-full bg-paper md:block" />
-              <div className="grid grid-cols-2 gap-4">
-                <Field label="Departs" value={departs} />
-                <Field label="Duration" value={fare.label} />
+            {/* ── 2D code ─────────────────────────────── */}
+            <div className="flex items-center justify-center px-5 pb-2 md:px-0 md:py-8">
+              <MatrixCode seed={`${EMAIL}/${fare.slug}`} cols={16} rows={64} className="hidden h-full max-h-[22rem] w-14 text-ink-900 md:block" />
+              <MatrixCode seed={`${EMAIL}/${fare.slug}`} cols={64} rows={10} className="h-12 w-full text-ink-900 md:hidden" />
+            </div>
+
+            {/* ── Stub ─────────────────────────────── */}
+            <div className="relative border-t-2 border-dashed border-ink-900/30 p-5 md:border-l-2 md:border-t-0 md:p-6">
+              <Brand small />
+              <p className="mt-2 text-[11px] font-bold tracking-[0.1em]">Boarding pass</p>
+
+              <div className="mt-4 text-[14px] leading-snug">
+                <p className="text-[8px] normal-case leading-none">Name</p>
+                <p>Recruiter/You</p>
+                <p className="pl-10">{BOOKING_REF}</p>
+                <p className="mt-1 text-[8px] normal-case leading-none">From</p>
+                <p className="flex justify-between"><span>Madrid</span><span>MAD</span></p>
+                <p className="text-[8px] normal-case leading-none">To</p>
+                <p className="flex justify-between"><span>Your team</span><span>YOU</span></p>
               </div>
-              <Barcode value={`${EMAIL}/${fare.slug}`} />
+
+              <div className="mt-3 grid grid-cols-4 gap-1 text-[8px] normal-case leading-tight">
+                <span>Flight</span>
+                <span>Class</span>
+                <span>Date</span>
+                <span className="text-right">Departs</span>
+              </div>
+              <p className="flex justify-between text-[14px] tabular">
+                <span>{FLIGHT}</span>
+                <span>{fare.code}</span>
+                <span>{date}</span>
+                <span>{departs}</span>
+              </p>
+
+              <div className="mt-3 flex items-end gap-3">
+                <div className="relative">
+                  <p className="text-[8px] normal-case">Gate</p>
+                  <p className="border-[1.5px] border-ink-900 px-2 py-0.5 text-[16px]">A24</p>
+                  {seen && <PenCircle k={`g-${fare.slug}`} />}
+                </div>
+                <div className="relative">
+                  <p className="text-[8px] normal-case">Arrival</p>
+                  <p className="border-[1.5px] border-ink-900 px-2 py-0.5 text-[16px] tabular">{arrives}</p>
+                  {seen && <PenCircle k={`a-${fare.slug}`} />}
+                </div>
+                <div>
+                  <p className="text-[8px] normal-case">Seat</p>
+                  <p className="text-[22px] font-bold leading-none">1A</p>
+                </div>
+              </div>
+
               <a
                 href={bookHref}
                 target="_blank"
                 rel="noreferrer"
-                className="flex items-center justify-between rounded-full bg-ink-900 px-5 py-3.5 text-sm font-medium text-paper transition-colors hover:bg-pen"
+                className="mt-5 flex items-center justify-between bg-ink-900 px-4 py-3 text-[13px] font-bold tracking-[0.1em] text-paper-light transition-colors hover:bg-pen"
               >
-                Book {fare.label} call
+                Board · Book {fare.label}
                 <span aria-hidden>→</span>
               </a>
+              <p className="mt-2 text-[12px] tracking-[0.08em]">ETKT 160 0052 0013</p>
             </div>
           </div>
         </Reveal>
 
         <Reveal delay={0.1}>
-          <div className="mt-8 flex flex-wrap items-center gap-3">
+          <div className="mt-10 flex flex-wrap items-center gap-3">
             <p className="mr-2 font-mono text-[11px] uppercase tracking-[0.14em] text-ink-500">Rather write?</p>
             <a
               href={`mailto:${EMAIL}`}
@@ -211,11 +372,7 @@ export default function Contact() {
             >
               {copied ? "Copied ✓" : "Copy email"}
             </button>
-            <a
-              href={CV_SRC}
-              download
-              className="px-3 py-3 text-sm font-medium text-ink-600 hover:text-ink-900 link-reveal"
-            >
+            <a href={CV_SRC} download className="px-3 py-3 text-sm font-medium text-ink-600 hover:text-ink-900 link-reveal">
               Download CV ↓
             </a>
             <a

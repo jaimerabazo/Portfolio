@@ -2,7 +2,7 @@
 
 import Reveal from "./Reveal";
 import SectionTitle from "./SectionTitle";
-import { Doodle, UNDERLINE } from "./Doodles";
+import { Doodle, Hand, UNDERLINE } from "./Doodles";
 
 type Entry = {
   period: string;
@@ -50,7 +50,7 @@ const sideQuests = [
     where: "JetBrains Hackathon",
     text: "Built end-to-end in Kotlin by a team of four, against the clock.",
     stamp: "WON",
-    href: "https://github.com/jaimerabazo/HACKATHON-JETBRAINS-ARRAYS-CON-GAMBAS",
+    href: "https://github.com/100475299/HACKATHON-JETBRAINS-ARRAYS-CON-GAMBAS",
   },
   {
     title: "RETO C4DX 2025",
@@ -134,9 +134,7 @@ export default function Logbook() {
                     {e.stack.join(" / ")}
                   </p>
                 </div>
-                <p className="hand self-start text-[1.6rem] md:pt-10 md:rotate-[-3deg]">
-                  {e.margin}
-                </p>
+                <Hand className="self-start text-[1.6rem] md:pt-10 md:rotate-[-3deg]">{e.margin}</Hand>
               </article>
             </Reveal>
           ))}

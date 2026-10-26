@@ -161,6 +161,20 @@ html.lenis body {
   to { transform: rotateX(0deg); filter: brightness(1); }
 }
 
+/* Thermal-printed ticket paper */
+.thermal {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.5), transparent 40%),
+    #f6f4ee;
+  color: #1c1c1c;
+  border-radius: 6px;
+  text-shadow: 0 0 0.6px rgba(28, 28, 28, 0.55);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.8) inset,
+    0 2px 4px rgba(21, 21, 21, 0.06),
+    0 30px 50px -30px rgba(21, 21, 21, 0.45);
+}
+
 /* Link underline reveal */
 .link-reveal {
   position: relative;

@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { CSSProperties, useEffect, useState } from "react";
 import SplitFlap from "./SplitFlap";
-import { ARROW, CIRCLE, Doodle } from "./Doodles";
+import { ARROW, CIRCLE, Doodle, Hand } from "./Doodles";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
@@ -91,13 +91,14 @@ export default function Hero() {
               </p>
               <p className="mt-6 max-w-xl text-[17px] leading-relaxed text-ink-600">
                 At Telefónica I built ML that forecasts KPIs across Spain&apos;s
-                mobile network, and automated the work around it — giving a
+                mobile network, and automated the work around it, giving a
                 20-person team back{" "}
                 <span className="relative inline-block whitespace-nowrap font-medium text-ink-900">
                   ~160 hours a month
                   <Doodle
                     paths={CIRCLE}
                     viewBox="0 0 200 64"
+                    mode="time"
                     delay={1.2}
                     strokeWidth={1.8}
                     stretch
@@ -130,7 +131,7 @@ export default function Hero() {
                   Download CV <span aria-hidden className="text-ink-400">↓</span>
                 </a>
                 <a
-                  href="https://www.linkedin.com/in/jaime-rabazo-fernandez/"
+                  href="https://www.linkedin.com/in/jaimerabazo"
                   target="_blank"
                   rel="noreferrer"
                   className="px-3 py-3.5 text-sm font-medium text-ink-600 hover:text-ink-900 transition-colors link-reveal"
@@ -187,14 +188,15 @@ export default function Hero() {
               <Doodle
                 paths={ARROW}
                 viewBox="0 0 100 70"
+                mode="time"
                 delay={1.4}
                 className="h-10 w-14 -scale-x-100 rotate-180"
               />
-              <span className="hand text-[1.5rem] -rotate-2">
+              <Hand as="span" mode="time" delay={1.8} className="text-[1.5rem] -rotate-2">
                 that&apos;s me,
                 <br />
                 mid-wink
-              </span>
+              </Hand>
             </figcaption>
           </motion.figure>
         </div>

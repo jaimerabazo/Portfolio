@@ -1,7 +1,67 @@
 "use client";
 
-import { motion } from "framer-motion";
+import {
+  motion,
+  MotionValue,
+  useMotionValue,
+  useReducedMotion,
+  useScroll,
+  useSpring,
+  useTransform,
+} from "framer-motion";
+import { ReactNode, RefObject, useRef } from "react";
 import clsx from "clsx";
+
+/**
+ * How ink appears:
+ * - "scroll": tied to scroll position — writes as the element scrolls up into
+ *   view, un-writes when you scroll back up.
+ * - "time": draws once when first seen (for things visible on load).
+ * - "mount": draws as soon as it renders (for marks that appear on interaction,
+ *   already on screen — a viewport trigger can miss those).
+ */
+type InkMode = "scroll" | "time" | "mount";
+
+/** 0 → 1 as the element travels from the bottom of the viewport to ~60% up. */
+function useInk(ref: RefObject<HTMLElement | null>): MotionValue<number> {
+  const reduce = useReducedMotion();
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start 0.95", "start 0.6"] });
+  // Near the end of the page an element may never reach 60% up the viewport,
+  // so finish the ink once the page is scrolled to the bottom.
+  const { scrollYProgress: page } = useScroll();
+  const target = useTransform([scrollYProgress, page], ([local, whole]: number[]) => (whole > 0.995 ? 1 : local));
+  const smooth = useSpring(target, { stiffness: 140, damping: 26, mass: 0.4 });
+  const full = useMotionValue(1);
+  return reduce ? full : smooth;
+}
+
+function InkPath({
+  d,
+  progress,
+  from,
+  to,
+  strokeWidth,
+}: {
+  d: string;
+  progress: MotionValue<number>;
+  from: number;
+  to: number;
+  strokeWidth: number;
+}) {
+  const pathLength = useTransform(progress, [from, to], [0, 1]);
+  const opacity = useTransform(progress, [from, from + 0.02], [0, 1]);
+  return (
+    <motion.path
+      d={d}
+      stroke="currentColor"
+      strokeWidth={strokeWidth}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      vectorEffect="non-scaling-stroke"
+      style={{ pathLength, opacity }}
+    />
+  );
+}
 
 type DoodleProps = {
   paths: string[];
@@ -10,34 +70,109 @@ type DoodleProps = {
   delay?: number;
   strokeWidth?: number;
   stretch?: boolean;
+  mode?: InkMode;
 };
 
-/** Hand-drawn line art that draws itself in when it scrolls into view. */
-export function Doodle({ paths, viewBox, className, delay = 0, strokeWidth = 2.2, stretch = false }: DoodleProps) {
+/** Hand-drawn ballpoint line art. */
+export function Doodle({
+  paths,
+  viewBox,
+  className,
+  delay = 0,
+  strokeWidth = 2.2,
+  stretch = false,
+  mode = "scroll",
+}: DoodleProps) {
+  const ref = useRef<SVGSVGElement>(null);
+  // useScroll only needs a box to measure; an <svg> works like any element.
+  const progress = useInk(ref as unknown as RefObject<HTMLElement | null>);
+  // In scroll mode, paths are drawn one after another across the progress range.
+  const span = 1 / Math.max(1, paths.length);
+
   return (
     <svg
+      ref={ref}
       viewBox={viewBox}
       fill="none"
       aria-hidden
       preserveAspectRatio={stretch ? "none" : undefined}
       className={clsx("overflow-visible text-pen", className)}
     >
-      {paths.map((d, i) => (
-        <motion.path
-          key={i}
-          d={d}
-          stroke="currentColor"
-          strokeWidth={strokeWidth}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          vectorEffect="non-scaling-stroke"
-          initial={{ pathLength: 0, opacity: 0 }}
-          whileInView={{ pathLength: 1, opacity: 1 }}
-          viewport={{ once: true, amount: 0.6 }}
-          transition={{ duration: 0.9, delay: delay + i * 0.15, ease: "easeInOut" }}
-        />
-      ))}
+      {paths.map((d, i) =>
+        mode === "scroll" ? (
+          <InkPath
+            key={i}
+            d={d}
+            progress={progress}
+            from={i * span * 0.85}
+            to={Math.min(1, (i + 1) * span)}
+            strokeWidth={strokeWidth}
+          />
+        ) : (
+          <motion.path
+            key={i}
+            d={d}
+            stroke="currentColor"
+            strokeWidth={strokeWidth}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            vectorEffect="non-scaling-stroke"
+            initial={{ pathLength: 0, opacity: 0 }}
+            {...(mode === "mount"
+              ? { animate: { pathLength: 1, opacity: 1 } }
+              : { whileInView: { pathLength: 1, opacity: 1 }, viewport: { once: true, amount: 0.6 } })}
+            transition={{ duration: 0.9, delay: delay + i * 0.15, ease: "easeInOut" }}
+          />
+        )
+      )}
     </svg>
+  );
+}
+
+type HandProps = {
+  children: ReactNode;
+  className?: string;
+  as?: "p" | "span";
+  mode?: InkMode;
+  delay?: number;
+};
+
+/** Handwritten note that "writes" itself left to right. */
+export function Hand({ children, className, as = "p", mode = "scroll", delay = 0 }: HandProps) {
+  const ref = useRef<HTMLElement>(null);
+  const progress = useInk(ref);
+  const clipPath = useTransform(progress, (v) => `inset(-25% ${(1 - v) * 100}% -25% -5%)`);
+  const Tag = (as === "span" ? motion.span : motion.p) as typeof motion.p;
+  const cls = clsx("hand", className);
+
+  if (mode !== "scroll") {
+    // The viewport trigger sits on the unclipped outer element: a fully
+    // clipped box has no visible area, so it would never count as in view.
+    return (
+      <Tag
+        ref={ref as RefObject<HTMLParagraphElement>}
+        className={cls}
+        initial="hidden"
+        whileInView="shown"
+        viewport={{ once: true, amount: 0.6 }}
+      >
+        <motion.span
+          className="block"
+          variants={{
+            hidden: { clipPath: "inset(-25% 100% -25% -5%)" },
+            shown: { clipPath: "inset(-25% 0% -25% -5%)" },
+          }}
+          transition={{ duration: 1.1, delay, ease: "easeInOut" }}
+        >
+          {children}
+        </motion.span>
+      </Tag>
+    );
+  }
+  return (
+    <Tag ref={ref as RefObject<HTMLParagraphElement>} className={cls} style={{ clipPath }}>
+      {children}
+    </Tag>
   );
 }
 

@@ -1,4 +1,5 @@
 import Reveal from "./Reveal";
+import { Hand } from "./Doodles";
 
 type Props = {
   kicker: string;
@@ -27,9 +28,7 @@ export default function SectionTitle({ kicker, title, note, dark = false }: Prop
         </h2>
       </div>
       {note && (
-        <p className="hand text-[1.6rem] md:max-w-[17rem] md:text-right md:-rotate-2">
-          {note}
-        </p>
+        <Hand className="text-[1.6rem] md:max-w-[17rem] md:text-right md:-rotate-2">{note}</Hand>
       )}
     </Reveal>
   );

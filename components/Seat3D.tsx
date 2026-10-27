@@ -19,7 +19,7 @@ type Face = {
   r: number;
   soft: boolean;
   o: number;
-  keep: boolean; // stays when the rest of the seat fades for the close-up
+  layer: Layer; // the close-up fades the seat first, then the tray, leaving the book
   img?: string;
 };
 
@@ -84,7 +84,8 @@ const BOOK = { w: 50, h: 74, spin: -7, x: 6 };
 const RECLINE = { min: 0, max: 40, start: 14 };
 const ZOOM = { min: 0.7, max: 1.8 };
 
-type BoxOpts = { tilt?: number; spin?: number; r?: number; soft?: boolean; o?: number; keep?: boolean; img?: string };
+type Layer = "seat" | "tray" | "book";
+type BoxOpts = { tilt?: number; spin?: number; r?: number; soft?: boolean; o?: number; layer?: Layer; img?: string };
 
 // Seat space: x right, y up, z toward the seat's front. The tray is on the
 // back of the backrest, hinged at its bottom edge; `t` runs 0 (folded) → 1 (level).
@@ -92,7 +93,7 @@ type BoxOpts = { tilt?: number; spin?: number; r?: number; soft?: boolean; o?: n
 function buildSeat(t: number, recline: number, cover: string): { faces: Face[]; focus: Vec3 } {
   const faces: Face[] = [];
   const box = (cx: number, cy: number, cz: number, w: number, h: number, d: number, color: string, opts: BoxOpts = {}) => {
-    const { tilt = 0, spin = 0, r = 0, soft = false, o = 1, keep = false, img } = opts;
+    const { tilt = 0, spin = 0, r = 0, soft = false, o = 1, layer = "seat", img } = opts;
     const dims: Dims = { w, h, d };
     FACES.forEach(([wk, hk, rot, dk, n], i) => {
       // the cover is laid out at 4× and scaled back down, so the close-up stays sharp
@@ -104,7 +105,7 @@ function buildSeat(t: number, recline: number, cover: string): { faces: Face[]; 
         r,
         soft,
         o,
-        keep,
+        layer,
         rgb: hex(i === 1 && img ? C.spine : color),
         n: rotX(rotZ(n, spin * DEG), tilt * DEG),
         img: i === 0 ? img : undefined,
@@ -152,7 +153,7 @@ function buildSeat(t: number, recline: number, cover: string): { faces: Face[]; 
   const tc = Math.cos(T * DEG), ts = Math.sin(T * DEG);
   const along = (k: number, n: number): [number, number] => [hinge[0] + k * tc + n * ts, hinge[1] - k * ts + n * tc];
   p = along(43, -1.5);
-  box(0, p[0], p[1], 128, 86, 3, C.tray, { tilt: T, r: 4, keep: true });
+  box(0, p[0], p[1], 128, 86, 3, C.tray, { tilt: T, r: 4, layer: "tray" });
   if (t > 0.02) {
     const A = recline + (90 - recline) * t * 0.5, L = 30 * t;
     const ac = Math.cos(A * DEG), as = Math.sin(A * DEG);
@@ -165,7 +166,7 @@ function buildSeat(t: number, recline: number, cover: string): { faces: Face[]; 
   const k = clamp((t - 0.65) / 0.35, 0, 1);
   if (k > 0) {
     p = along(45, 3 + (1 - k) * 24);
-    box(BOOK.x, p[0], p[1], BOOK.w, BOOK.h, 6, C.pages, { tilt: T, spin: BOOK.spin, r: 1, o: k, keep: true, img: cover });
+    box(BOOK.x, p[0], p[1], BOOK.w, BOOK.h, 6, C.pages, { tilt: T, spin: BOOK.spin, r: 1, o: k, layer: "book", img: cover });
   }
   // where it lies once the tray is level: the camera's close-up target (its cover face)
   const focus: Vec3 = [BOOK.x, -(hinge[0] + 6), hinge[1] - 45];
@@ -192,6 +193,7 @@ type Props = { cover: string; title: string; progress: MotionValue<number> };
 export default function Seat3D({ cover, title, progress }: Props) {
   const stage = useRef<HTMLDivElement>(null);
   const world = useRef<HTMLDivElement>(null);
+  const shadow = useRef<HTMLDivElement>(null);
   const faceEls = useRef<(HTMLDivElement | null)[]>([]);
   const reduce = !!useReducedMotion();
 
@@ -229,7 +231,8 @@ export default function Seat3D({ cover, title, progress }: Props) {
     const paint = () => {
       const v = view.current;
       const e = phase(progress.get(), ...DIVE);
-      const fade = clamp((e - 0.08) / 0.4, 0, 1);
+      const fade = { seat: clamp((e - 0.08) / 0.4, 0, 1), tray: clamp((e - 0.5) / 0.35, 0, 1), book: 0 };
+      if (shadow.current) shadow.current.style.opacity = String(1 - fade.seat);
       const dRy = ((((CLOSE_UP.ry - v.ry) % 360) + 540) % 360) - 180;
       const rx = v.rx + (CLOSE_UP.rx - v.rx) * e;
       const ry = v.ry + dRy * e;
@@ -248,7 +251,7 @@ export default function Seat3D({ cover, title, progress }: Props) {
         // the cover ends up flat on, so its lighting eases back to neutral
         if (f.img) el.style.filter = `brightness(${(b + (1 - b) * e).toFixed(3)})`;
         else el.style.backgroundColor = `rgb(${f.rgb.map((x) => Math.min(255, Math.round(x * b))).join(",")})`;
-        el.style.opacity = String(f.o * (f.keep ? 1 : 1 - fade));
+        el.style.opacity = String(f.o * (1 - fade[f.layer]));
       });
     };
     paintRef.current = paint;
@@ -332,6 +335,7 @@ export default function Seat3D({ cover, title, progress }: Props) {
       >
         <div ref={world} className="absolute left-1/2 top-[calc(50%-56px)] h-0 w-0" style={{ transformStyle: "preserve-3d" }}>
           <div
+            ref={shadow}
             aria-hidden
             className="absolute -left-[150px] -top-[130px] h-[260px] w-[300px] rounded-full"
             style={{

@@ -38,8 +38,7 @@ export default function Lounge() {
           what keeps me busy between flights.
         </p>
 
-        {/* Two columns so the next live card (music) sits beside the book. */}
-        <div className="mt-14 grid gap-6 lg:grid-cols-2">
+        <div className="mt-6">
           <Reading />
         </div>
       </div>

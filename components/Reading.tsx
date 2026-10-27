@@ -1,7 +1,10 @@
 "use client";
 
+import { useScroll } from "framer-motion";
+import { useRef } from "react";
 import reading from "@/public/data/reading.json";
 import { Hand } from "./Doodles";
+import Seat3D from "./Seat3D";
 
 // Goodreads "currently reading" shelf, refreshed at build time by
 // scripts/fetch-reading.mjs (and a daily scheduled deploy).
@@ -11,48 +14,62 @@ const fmtMonth = new Intl.DateTimeFormat("en-GB", { month: "short", timeZone: "E
 const since = (iso: string) => `${fmtDay.format(new Date(iso))} ${fmtMonth.format(new Date(iso)).slice(0, 3)}`;
 
 export default function Reading() {
+  const ref = useRef<HTMLElement>(null);
+  // The section is tall and its contents stick, so scrolling through it
+  // plays the seat: tray unfolds, book lands, camera dives onto the cover.
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
   const [book, ...others] = reading.books;
   if (!book) return null;
 
   return (
-    <a
-      href={book.url}
-      target="_blank"
-      rel="noreferrer"
-      className="group relative flex gap-5 overflow-hidden rounded-xl border border-ink-900/10 bg-paper-light p-4 pl-6 transition-colors hover:border-ink-900/25 sm:gap-6 sm:p-5 sm:pl-7"
-    >
-      {/* navy spine, matching the boarding pass livery */}
-      <span aria-hidden className="absolute inset-y-0 left-0 w-1.5 bg-livery" />
+    <section ref={ref} aria-label="In-flight reading" className="relative h-[320vh]">
+      <div className="sticky top-0 grid h-[100svh] grid-rows-[minmax(0,1fr)_auto] gap-6 pb-10 pt-24 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:grid-rows-1 lg:items-center lg:gap-12 lg:py-20">
+        <a
+          href={book.url}
+          target="_blank"
+          rel="noreferrer"
+          className="group relative order-2 flex min-w-0 flex-col pl-6 lg:order-1 lg:pl-8"
+        >
+          {/* navy spine, matching the boarding pass livery */}
+          <span aria-hidden className="absolute inset-y-0 left-0 w-1.5 rounded-full bg-livery" />
 
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={book.cover}
-        alt={`Cover of ${book.title}`}
-        loading="lazy"
-        className="h-32 w-auto shrink-0 -rotate-2 rounded-sm shadow-[0_10px_24px_-10px_rgba(21,21,21,0.55)] transition-transform duration-500 group-hover:rotate-0 sm:h-36"
-      />
-
-      <div className="flex min-w-0 flex-col">
-        <p className="whitespace-nowrap font-mono text-[10px] uppercase tracking-[0.14em] text-ink-500 sm:text-[11px] sm:tracking-[0.2em]">
-          In-flight reading <span className="text-livery-gold">●</span> now
-        </p>
-        <p className="mt-2 font-serif text-[1.4rem] leading-[1.1] text-ink-900 sm:text-[1.6rem]">{book.title}</p>
-        {book.subtitle && (
-          <p className="mt-1 line-clamp-2 font-serif text-[15px] italic leading-snug text-ink-600">{book.subtitle}</p>
-        )}
-        <p className="mt-2 text-[14px] text-ink-600">by {book.author}</p>
-
-        <div className="mt-auto flex flex-wrap items-end justify-between gap-x-4 gap-y-1 pt-3">
-          <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-400">
-            Since {since(book.added)} · via Goodreads ↗
-          </span>
-          {others.length > 0 && (
-            <Hand as="span" className="text-[1.1rem]">
-              + {others.length} more on the go
-            </Hand>
+          <p className="whitespace-nowrap font-mono text-[10px] uppercase tracking-[0.14em] text-ink-500 sm:text-[11px] sm:tracking-[0.2em]">
+            In-flight reading <span className="text-livery-gold">●</span> now
+          </p>
+          <p className="mt-3 font-serif text-[1.6rem] leading-[1.08] text-ink-900 transition-colors group-hover:text-livery sm:text-[2.2rem]">
+            {book.title}
+          </p>
+          {book.subtitle && (
+            <p className="mt-2 line-clamp-2 font-serif text-[15px] italic leading-snug text-ink-600 sm:text-[17px]">{book.subtitle}</p>
           )}
+          <p className="mt-3 text-[14px] text-ink-600 sm:text-[15px]">by {book.author}</p>
+
+          <div className="mt-5 flex flex-wrap items-end gap-x-5 gap-y-1">
+            <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-400 transition-colors group-hover:text-ink-900">
+              Since {since(book.added)} · via Goodreads ↗
+            </span>
+            {others.length > 0 && (
+              <Hand as="span" className="text-[1.1rem]">
+                + {others.length} more on the go
+              </Hand>
+            )}
+          </div>
+        </a>
+
+        <div className="relative order-1 h-full min-h-0 lg:order-2">
+          <Seat3D cover={book.cover} title={book.title} progress={scrollYProgress} />
+          <Hand
+            as="span"
+            mode="time"
+            delay={2}
+            className="pointer-events-none absolute right-2 top-4 hidden rotate-6 text-[1.2rem] leading-[1.05] sm:block"
+          >
+            left it here,
+            <br />
+            back in a sec
+          </Hand>
         </div>
       </div>
-    </a>
+    </section>
   );
 }

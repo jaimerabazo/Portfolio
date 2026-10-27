@@ -24,11 +24,8 @@ export default function Reading() {
   return (
     <section ref={ref} aria-label="In-flight reading" className="relative h-[320vh]">
       <div className="sticky top-0 grid h-[100svh] grid-rows-[minmax(0,1fr)_auto] gap-6 pb-10 pt-24 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:grid-rows-1 lg:items-center lg:gap-12 lg:py-20">
-        <a
-          href={book.url}
-          target="_blank"
-          rel="noreferrer"
-          className="group relative order-2 flex min-w-0 flex-col pl-6 lg:order-1 lg:pl-8"
+        <div
+          className="relative order-2 flex min-w-0 flex-col pl-6 lg:order-1 lg:pl-8"
         >
           {/* navy spine, matching the boarding pass livery */}
           <span aria-hidden className="absolute inset-y-0 left-0 w-1.5 rounded-full bg-livery" />
@@ -36,7 +33,7 @@ export default function Reading() {
           <p className="whitespace-nowrap font-mono text-[10px] uppercase tracking-[0.14em] text-ink-500 sm:text-[11px] sm:tracking-[0.2em]">
             In-flight reading <span className="text-livery-gold">●</span> now
           </p>
-          <p className="mt-3 font-serif text-[1.6rem] leading-[1.08] text-ink-900 transition-colors group-hover:text-livery sm:text-[2.2rem]">
+          <p className="mt-3 font-serif text-[1.6rem] leading-[1.08] text-ink-900 sm:text-[2.2rem]">
             {book.title}
           </p>
           {book.subtitle && (
@@ -45,8 +42,8 @@ export default function Reading() {
           <p className="mt-3 text-[14px] text-ink-600 sm:text-[15px]">by {book.author}</p>
 
           <div className="mt-5 flex flex-wrap items-end gap-x-5 gap-y-1">
-            <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-400 transition-colors group-hover:text-ink-900">
-              Since {since(book.added)} · via Goodreads ↗
+            <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-400">
+              Since {since(book.added)} · via Goodreads
             </span>
             {others.length > 0 && (
               <Hand as="span" className="text-[1.1rem]">
@@ -54,7 +51,7 @@ export default function Reading() {
               </Hand>
             )}
           </div>
-        </a>
+        </div>
 
         <div className="relative order-1 h-full min-h-0 lg:order-2">
           <Seat3D cover={book.cover} title={book.title} progress={scrollYProgress} />

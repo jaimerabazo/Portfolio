@@ -371,7 +371,7 @@ export default function Contact() {
               Download CV ↓
             </a>
             <a
-              href="https://www.linkedin.com/in/jaime-rabazo-fernandez/"
+              href="https://www.linkedin.com/in/jaimerabazo"
               target="_blank"
               rel="noreferrer"
               className="px-3 py-3 text-sm font-medium text-ink-600 hover:text-ink-900 link-reveal"

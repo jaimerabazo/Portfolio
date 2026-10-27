@@ -10,7 +10,7 @@ export default function Footer() {
           thanks for flying this far ✈
         </Hand>
         <div className="flex gap-6">
-          <a href="https://www.linkedin.com/in/jaime-rabazo-fernandez/" target="_blank" rel="noreferrer" className="hover:text-ink-900 link-reveal">
+          <a href="https://www.linkedin.com/in/jaimerabazo" target="_blank" rel="noreferrer" className="hover:text-ink-900 link-reveal">
             LinkedIn
           </a>
           <a href="https://github.com/jaimerabazo" target="_blank" rel="noreferrer" className="hover:text-ink-900 link-reveal">

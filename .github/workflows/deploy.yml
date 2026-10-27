@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
-  # Daily rebuild so the Goodreads "currently reading" book stays fresh.
+  # Daily rebuild so the Goodreads book and Apple Music songs stay fresh.
   schedule:
     - cron: "0 6 * * *"
 

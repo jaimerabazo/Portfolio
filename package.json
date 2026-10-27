@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "reading": "node scripts/fetch-reading.mjs",
-    "prebuild": "node scripts/fetch-reading.mjs",
+    "music": "node scripts/fetch-music.mjs",
+    "prebuild": "node scripts/fetch-reading.mjs && node scripts/fetch-music.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"

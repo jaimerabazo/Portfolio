@@ -1,7 +1,7 @@
 "use client";
 
 import { useMotionValueEvent, useReducedMotion, type MotionValue } from "framer-motion";
-import { useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 
 // Economy seat built from CSS 3D boxes, seen from behind. Scroll drives it:
 // the tray table unfolds, the book drops onto it, then the camera dives onto
@@ -154,20 +154,26 @@ function buildSeat(t: number, recline: number, cover: string): { faces: Face[]; 
   const along = (k: number, n: number): [number, number] => [hinge[0] + k * tc + n * ts, hinge[1] - k * ts + n * tc];
   p = along(43, -1.5);
   box(0, p[0], p[1], 128, 86, 3, C.tray, { tilt: T, r: 4, layer: "tray" });
-  if (t > 0.02) {
+  // Nothing below may cut into another box: where 3D faces intersect, the
+  // browser has to split them to sort them and gets it wrong now and then
+  // (pieces flicker behind the shell, the blue backrest tears through it).
+  // Struts and book are also always built (just hidden), so the face list
+  // never changes length and faces never swap each other's styles.
+  {
+    // struts: clear of the shell's back and of the tray's side edges
     const A = recline + (90 - recline) * t * 0.5, L = 30 * t;
     const ac = Math.cos(A * DEG), as = Math.sin(A * DEG);
+    const foot = at(89, -33.5);
     for (const s of [-1, 1]) {
-      box(s * 66, hinge[0] + (L / 2) * ac, hinge[1] - (L / 2) * as, 4, Math.max(1, L), 4, C.metal, { tilt: A });
+      box(s * 68, foot[0] + (L / 2) * ac, foot[1] - (L / 2) * as, 4, Math.max(1, L), 3, C.metal, { tilt: A, o: t > 0.02 ? 1 : 0 });
     }
   }
 
-  // the book drops onto the tray once it is nearly level
+  // the book is set down on the tray once it is nearly level, coming in from
+  // its outer end (dropping straight down would pass through the backrest)
   const k = clamp((t - 0.65) / 0.35, 0, 1);
-  if (k > 0) {
-    p = along(45, 3 + (1 - k) * 24);
-    box(BOOK.x, p[0], p[1], BOOK.w, BOOK.h, 6, C.pages, { tilt: T, spin: BOOK.spin, r: 1, o: k, layer: "book", img: cover });
-  }
+  p = along(45 + (1 - k) * 30, 3 + (1 - k) * 10);
+  box(BOOK.x, p[0], p[1], BOOK.w, BOOK.h, 6, C.pages, { tilt: T, spin: BOOK.spin, r: 1, o: k, layer: "book", img: cover });
   // where it lies once the tray is level: the camera's close-up target (its cover face)
   const focus: Vec3 = [BOOK.x, -(hinge[0] + 6), hinge[1] - 45];
 
@@ -222,8 +228,9 @@ export default function Seat3D({ cover, title, progress }: Props) {
     return () => ro.disconnect();
   }, []);
 
-  // camera + lighting, written straight to the DOM every frame
-  useEffect(() => {
+  // camera + lighting, written straight to the DOM every frame. A layout
+  // effect, so a re-render's flat, unlit face colours never reach the screen.
+  useLayoutEffect(() => {
     // leave room for the controls under the seat
     const base = Math.min(size.w / 380, (size.h - 120) / 440);
     const close = Math.min((size.h * 0.7) / BOOK.h, (size.w * 0.8) / BOOK.w);

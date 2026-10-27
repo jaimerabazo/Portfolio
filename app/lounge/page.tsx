@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import SplitFlap from "@/components/SplitFlap";
 import { Hand } from "@/components/Doodles";
+import Reading from "@/components/Reading";
 
 export const metadata: Metadata = {
   title: "The Lounge — Jaime Rabazo",
@@ -36,6 +37,11 @@ export default function Lounge() {
           The bit of me that doesn&apos;t fit on a CV: what I&apos;m reading, what&apos;s on repeat, and
           what keeps me busy between flights.
         </p>
+
+        {/* Two columns so the next live card (music) sits beside the book. */}
+        <div className="mt-14 grid gap-6 lg:grid-cols-2">
+          <Reading />
+        </div>
       </div>
     </section>
   );

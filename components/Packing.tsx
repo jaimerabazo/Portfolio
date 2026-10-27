@@ -4,7 +4,7 @@ import clsx from "clsx";
 import Reveal from "./Reveal";
 import SectionTitle from "./SectionTitle";
 import { Doodle, Hand, ICONS } from "./Doodles";
-import Reading from "./Reading";
+import Link from "next/link";
 
 const carryOn: { title: string; items: string[] }[] = [
   { title: "Code", items: ["Python", "Pandas", "Scikit-learn", "PySpark", "SQL", "Java", "C", "Kotlin", "MATLAB"] },
@@ -68,9 +68,18 @@ export default function Packing() {
                 </li>
               ))}
             </ul>
-            <div className="mt-6">
-              <Reading />
-            </div>
+            <Link
+              href="/lounge/"
+              className="group mt-6 flex items-center justify-between gap-4 rounded-xl border border-dashed border-ink-900/20 px-5 py-4 transition-colors hover:border-ink-900/40"
+            >
+              <span>
+                <span className="block font-mono text-[11px] uppercase tracking-[0.2em] text-ink-500">Off duty?</span>
+                <span className="mt-1 block font-serif text-[1.35rem] leading-tight text-ink-900">
+                  Come to the lounge: what I&apos;m reading and more
+                </span>
+              </span>
+              <span aria-hidden className="text-[1.3rem] text-livery transition-transform group-hover:translate-x-1">→</span>
+            </Link>
           </Reveal>
         </div>
       </div>

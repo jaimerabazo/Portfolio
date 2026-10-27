@@ -1,0 +1,142 @@
+{
+  "updated": "2026-10-27T13:38:20.772Z",
+  "playlist": {
+    "title": "Favorite Songs",
+    "url": "https://music.apple.com/es/playlist/favourite-songs/pl.u-3zUP16pZKN",
+    "total": 300
+  },
+  "songs": [
+    {
+      "title": "wasteland",
+      "artist": "Bana",
+      "album": "wasteland - Single",
+      "cover": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/5d/ee/d0/5deed023-8ac1-a853-b349-19b0b15a2948/1499394.jpg/600x600bb.jpg",
+      "color": "#655f55",
+      "duration": 143,
+      "explicit": true,
+      "url": "https://music.apple.com/es/album/wasteland/6821400433?i=6821400434&l=en-GB",
+      "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/9c/d3/42/9cd34286-2a0c-d63d-ea5b-7ec9dc81eeef/mzaf_16311946985662563125.plus.aac.p.m4a"
+    },
+    {
+      "title": "Love Grows (Where My Rosemary Goes)",
+      "artist": "Edison Lighthouse",
+      "album": "Love Grows (Where My Rosemary Goes) & Other Gems",
+      "cover": "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/eb/f1/22/ebf1223c-6f20-a0ef-0605-9042a2cb9f89/cover.jpg/600x600bb.jpg",
+      "color": "#1c1d20",
+      "duration": 175,
+      "explicit": false,
+      "url": "https://music.apple.com/es/album/love-grows-where-my-rosemary-goes/1492218058?i=1492218059&l=en-GB",
+      "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/22/90/c0/2290c0db-1f20-2390-0f99-56a8684a714a/mzaf_3072061974578523150.plus.aac.p.m4a"
+    },
+    {
+      "title": "La Falda",
+      "artist": "Judeline",
+      "album": "La Falda - Single",
+      "cover": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/30/c6/85/30c68535-635c-ee80-c4af-abb0a5e02933/823375500766_Cover.jpg/600x600bb.jpg",
+      "color": "#837753",
+      "duration": 156,
+      "explicit": false,
+      "url": "https://music.apple.com/es/album/la-falda/6819177800?i=6819178076&l=en-GB",
+      "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/17/76/ae/1776aeb4-9df2-3034-7009-b2491200fe75/mzaf_7036195154036460951.plus.aac.p.m4a"
+    },
+    {
+      "title": "Paper Planes",
+      "artist": "M.I.A.",
+      "album": "Paper Planes (Homeland Security Remixes) - EP",
+      "cover": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/00/86/97/00869770-a60e-01ac-eb3f-0ef6f6159221/634904032869.png/600x600bb.jpg",
+      "color": "#e3e7d0",
+      "duration": 205,
+      "explicit": false,
+      "url": "https://music.apple.com/es/album/paper-planes/272614627?i=272614724&l=en-GB",
+      "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/6d/47/9e/6d479e52-8c3e-844c-4c77-5218a936910f/mzaf_12295422517253137822.plus.aac.p.m4a"
+    },
+    {
+      "title": "Boys",
+      "artist": "ADÉLA",
+      "album": "PRIMA",
+      "cover": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/5d/77/7b/5d777b87-e796-0b3e-cef6-d37d993dd8fe/26UMGIM82371.rgb.jpg/600x600bb.jpg",
+      "color": "#f3f3f1",
+      "duration": 145,
+      "explicit": true,
+      "url": "https://music.apple.com/es/album/boys/6792883860?i=6792884091&l=en-GB",
+      "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/4d/e4/b8/4de4b898-eba1-2f3d-0bf3-e431531f1d24/mzaf_9557317412307826491.plus.aac.p.m4a"
+    },
+    {
+      "title": "Nicole Kidman",
+      "artist": "ADÉLA",
+      "album": "PRIMA",
+      "cover": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/5d/77/7b/5d777b87-e796-0b3e-cef6-d37d993dd8fe/26UMGIM82371.rgb.jpg/600x600bb.jpg",
+      "color": "#f3f3f1",
+      "duration": 181,
+      "explicit": true,
+      "url": "https://music.apple.com/es/album/nicole-kidman/6792883860?i=6792884088&l=en-GB",
+      "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/76/bf/8b/76bf8bad-7dff-5adc-7a2f-05c4b03e1e86/mzaf_11974986281424556101.plus.aac.p.m4a"
+    },
+    {
+      "title": "King",
+      "artist": "Years & Years",
+      "album": "Night Call (New Year's Edition)",
+      "cover": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/63/54/43/635443d4-70fc-ab27-e622-17b63853eebc/21UM1IM07256.rgb.jpg/600x600bb.jpg",
+      "color": "#6b7997",
+      "duration": 215,
+      "explicit": false,
+      "url": "https://music.apple.com/es/album/king/1599561225?i=1599561941&l=en-GB",
+      "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/90/33/0c/90330c74-86db-bb30-6f00-42bd4b07380e/mzaf_3963674853430515636.plus.aac.p.m4a"
+    },
+    {
+      "title": "Time of Our Lives",
+      "artist": "Pitbull & Ne-Yo",
+      "album": "Globalization",
+      "cover": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/7d/cc/08/7dcc0849-8aed-b259-e246-f7ffad54507b/886444753852.jpg/600x600bb.jpg",
+      "color": "#ffffff",
+      "duration": 229,
+      "explicit": true,
+      "url": "https://music.apple.com/es/album/time-of-our-lives/933984003?i=933984166&l=en-GB",
+      "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/e2/a7/b2/e2a7b273-6495-86c0-6d3c-805d1e941ba3/mzaf_8024972504471207299.plus.aac.p.m4a"
+    },
+    {
+      "title": "Wild Ones (feat. Sia)",
+      "artist": "Flo Rida",
+      "album": "Wild Ones",
+      "cover": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/eb/ca/0d/ebca0d0d-3c73-686a-285a-f5899d1e0f25/075679954046.jpg/600x600bb.jpg",
+      "color": "#000000",
+      "duration": 233,
+      "explicit": false,
+      "url": "https://music.apple.com/es/album/wild-ones-feat-sia/613867183?i=613867347&l=en-GB",
+      "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/24/d7/ff/24d7ff7c-e488-b596-924a-d71d3fd0bd39/mzaf_7949949405793396155.plus.aac.p.m4a"
+    },
+    {
+      "title": "The Bellboy (One Last Crush)",
+      "artist": "Suki Waterhouse",
+      "album": "Memoir of a Sparklemuffin (Deluxe)",
+      "cover": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/bc/c2/e4/bcc2e4e9-552f-d21a-92ee-9b5426440f9d/098787964660.png/600x600bb.jpg",
+      "color": "#451720",
+      "duration": 208,
+      "explicit": true,
+      "url": "https://music.apple.com/es/album/the-bellboy-one-last-crush/1818445932?i=1818446450&l=en-GB",
+      "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/f5/79/98/f57998ed-5d13-8995-329b-688e44b8ebfc/mzaf_1689578217068819932.plus.aac.p.m4a"
+    },
+    {
+      "title": "Coffee",
+      "artist": "Chappell Roan",
+      "album": "The Rise and Fall of a Midwest Princess",
+      "cover": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/42/a0/c5/42a0c5e6-6b98-f1f9-7d6b-6d6c61aba562/23UMGIM84225.rgb.jpg/600x600bb.jpg",
+      "color": "#d1b692",
+      "duration": 206,
+      "explicit": false,
+      "url": "https://music.apple.com/es/album/coffee/1707412988?i=1707413101&l=en-GB",
+      "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ee/e6/51/eee6517a-9070-2e20-8d7a-b9a558d87c52/mzaf_637319210302446283.plus.aac.p.m4a"
+    },
+    {
+      "title": "Popular Song",
+      "artist": "MIKA & Ariana Grande",
+      "album": "Yours Truly",
+      "cover": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/0a/19/23/0a19235d-8bcc-76d4-58ca-61a65d928587/13UAAIM68293.rgb.jpg/600x600bb.jpg",
+      "color": "#131313",
+      "duration": 200,
+      "explicit": false,
+      "url": "https://music.apple.com/es/album/popular-song/1440860819?i=1440861229&l=en-GB",
+      "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/da/ae/5a/daae5ae2-0700-a659-c5fb-ee1923bd38ab/mzaf_15020206440791148510.plus.aac.p.m4a"
+    }
+  ]
+}

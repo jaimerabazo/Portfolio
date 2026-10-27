@@ -3,7 +3,7 @@ import Link from "next/link";
 import SplitFlap from "@/components/SplitFlap";
 import { Hand } from "@/components/Doodles";
 import Reading from "@/components/Reading";
-import InflightMusic from "@/components/InflightMusic";
+import InflightEntertainment from "@/components/InflightEntertainment";
 
 export const metadata: Metadata = {
   title: "The Lounge — Jaime Rabazo",
@@ -41,7 +41,7 @@ export default function Lounge() {
 
         <div className="mt-6">
           <Reading />
-          <InflightMusic />
+          <InflightEntertainment />
         </div>
       </div>
     </section>

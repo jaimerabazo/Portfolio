@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { ComponentProps, useEffect, useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 
 const links = [
@@ -9,13 +11,23 @@ const links = [
   { href: "#route", label: "Route" },
   { href: "#packing", label: "Packing list" },
   { href: "#contact", label: "Book a call" },
+  { href: "/lounge/", label: "Lounge" },
 ];
+
+// Section anchors live on the home page. There they stay plain anchors (the
+// smooth-scroll handler picks them up); from other pages they lead home first.
+function Go({ href, home, ...rest }: { href: string; home: boolean } & Omit<ComponentProps<"a">, "href">) {
+  if (href.startsWith("#") && home) return <a href={href} {...rest} />;
+  return <Link href={href.startsWith("#") ? `/${href}` : href} {...rest} />;
+}
 
 const CV_SRC = `${process.env.NEXT_PUBLIC_BASE_PATH || ""}/cv/Jaime-Rabazo-CV.pdf`;
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  // Section anchors live on the home page; from other pages, go there first.
+  const home = usePathname() === "/";
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -35,17 +47,17 @@ export default function Navbar() {
         }`}
       >
         <nav className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3.5 md:px-10">
-          <a href="#top" aria-label="Jaime Rabazo — back to top" className="board inline-flex gap-[2px] rounded-md p-1 font-mono text-[15px] font-bold">
+          <Go href="#top" home={home} aria-label="Jaime Rabazo — back to top" className="board inline-flex gap-[2px] rounded-md p-1 font-mono text-[15px] font-bold">
             <span className="flap-tile">J</span>
             <span className="flap-tile">R</span>
-          </a>
+          </Go>
 
           <ul className="hidden items-center gap-7 lg:flex whitespace-nowrap font-mono text-[12px] uppercase tracking-[0.12em]">
             {links.map((l) => (
               <li key={l.href}>
-                <a href={l.href} className="text-ink-600 hover:text-ink-900 transition-colors link-reveal">
+                <Go href={l.href} home={home} className="text-ink-600 hover:text-ink-900 transition-colors link-reveal">
                   {l.label}
-                </a>
+                </Go>
               </li>
             ))}
           </ul>
@@ -98,9 +110,9 @@ export default function Navbar() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 + i * 0.05, duration: 0.6 }}
                 >
-                  <a href={l.href} onClick={() => setOpen(false)} className="font-serif text-4xl text-ink-900">
+                  <Go href={l.href} home={home} onClick={() => setOpen(false)} className="font-serif text-4xl text-ink-900">
                     {l.label}
-                  </a>
+                  </Go>
                 </motion.li>
               ))}
               <li className="mt-6 flex gap-3">

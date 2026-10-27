@@ -4,6 +4,9 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  # Daily rebuild so the Goodreads "currently reading" book stays fresh.
+  schedule:
+    - cron: "0 6 * * *"
 
 permissions:
   contents: read

@@ -4,6 +4,7 @@ import clsx from "clsx";
 import Reveal from "./Reveal";
 import SectionTitle from "./SectionTitle";
 import { Doodle, Hand, ICONS } from "./Doodles";
+import Reading from "./Reading";
 
 const carryOn: { title: string; items: string[] }[] = [
   { title: "Code", items: ["Python", "Pandas", "Scikit-learn", "PySpark", "SQL", "Java", "C", "Kotlin", "MATLAB"] },
@@ -67,6 +68,9 @@ export default function Packing() {
                 </li>
               ))}
             </ul>
+            <div className="mt-6">
+              <Reading />
+            </div>
           </Reveal>
         </div>
       </div>

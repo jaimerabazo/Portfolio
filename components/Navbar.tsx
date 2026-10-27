@@ -4,18 +4,25 @@ import { ComponentProps, useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import clsx from "clsx";
+import { Doodle, ICONS } from "./Doodles";
 
-const links = [
+const links: { href: string; label: string; lounge?: boolean }[] = [
   { href: "#departures", label: "Departures" },
   { href: "#logbook", label: "Logbook" },
   { href: "#route", label: "Route" },
   { href: "#packing", label: "Packing list" },
   { href: "#contact", label: "Book a call" },
-  { href: "/lounge/", label: "Lounge" },
+  // Its own page, not a section: set apart in blue pen with a sofa.
+  { href: "/lounge/", label: "Lounge", lounge: true },
 ];
 
 // Section anchors live on the home page. There they stay plain anchors (the
 // smooth-scroll handler picks them up); from other pages they lead home first.
+function Sofa({ className }: { className: string }) {
+  return <Doodle paths={ICONS.sofa} viewBox="0 0 64 64" mode="mount" delay={0.8} strokeWidth={1.7} className={className} />;
+}
+
 function Go({ href, home, ...rest }: { href: string; home: boolean } & Omit<ComponentProps<"a">, "href">) {
   if (href.startsWith("#") && home) return <a href={href} {...rest} />;
   return <Link href={href.startsWith("#") ? `/${href}` : href} {...rest} />;
@@ -54,8 +61,16 @@ export default function Navbar() {
 
           <ul className="hidden items-center gap-7 lg:flex whitespace-nowrap font-mono text-[12px] uppercase tracking-[0.12em]">
             {links.map((l) => (
-              <li key={l.href}>
-                <Go href={l.href} home={home} className="text-ink-600 hover:text-ink-900 transition-colors link-reveal">
+              <li key={l.href} className={clsx(l.lounge && "border-l border-ink-900/15 pl-7")}>
+                <Go
+                  href={l.href}
+                  home={home}
+                  className={clsx(
+                    "transition-colors link-reveal",
+                    l.lounge ? "inline-flex items-center gap-1.5 text-pen hover:text-ink-900" : "text-ink-600 hover:text-ink-900"
+                  )}
+                >
+                  {l.lounge && <Sofa className="-my-1 h-6 w-6" />}
                   {l.label}
                 </Go>
               </li>
@@ -110,7 +125,13 @@ export default function Navbar() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 + i * 0.05, duration: 0.6 }}
                 >
-                  <Go href={l.href} home={home} onClick={() => setOpen(false)} className="font-serif text-4xl text-ink-900">
+                  <Go
+                    href={l.href}
+                    home={home}
+                    onClick={() => setOpen(false)}
+                    className={clsx("font-serif text-4xl", l.lounge ? "inline-flex items-center gap-3 text-pen" : "text-ink-900")}
+                  >
+                    {l.lounge && <Sofa className="h-10 w-10" />}
                     {l.label}
                   </Go>
                 </motion.li>
